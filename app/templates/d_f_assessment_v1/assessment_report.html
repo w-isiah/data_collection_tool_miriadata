@@ -1,0 +1,225 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %}Assessment Report{% endblock %}
+
+{% block body_class %}moderator_sidebar-mini{% endblock body_class %}
+
+{% block stylesheets %}
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<!-- AdminLTE Theme Style -->
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<!-- Custom Styles -->
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+
+<style>
+  .alert-container {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050; /* Ensure flash messages appear above other content */
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .alert {
+    margin-bottom: 10px; /* Add some space between consecutive messages */
+  }
+</style>
+
+
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <!-- Flash Messages Container -->
+    <!-- Flash Messages -->
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card card-info">
+          <div class="card-header">
+            <h3 class="card-title">Teacher Observation Tool Assessment Data (Report</h3>
+          </div>
+          <div class="card-body">
+            <div class="d-flex flex-wrap mb-4">
+              <!-- Filter Form -->
+              <form method="POST" action="{{ url_for('assessment.assessment_report') }}" class="form-inline mr-2 mb-2">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group mr-2">
+                  <label for="programme" class="mr-2">Programme:</label>
+                  <select name="programme_id" id="programme" class="form-control select2" required>
+                    <option value="">Select Programme</option>
+                    {% for programme in programmes %}
+                    <option value="{{ programme.id }}" {% if programme.id == programme_id %} selected {% endif %}>
+                      {{ programme.programme_name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="form-group mr-2">
+                  <label for="term" class="mr-2">Term:</label>
+                  <select name="term_id" id="term" class="form-control select2" required>
+                    <option value="">Select Term</option>
+                    {% for term in terms %}
+                    <option value="{{ term.id }}" {% if term.id == term_id %} selected {% endif %}>
+                      {{ term.term }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-sm">Search</button>
+              </form>
+
+              <!-- Student Registration Form -->
+              <form method="POST" action="{{ url_for('assessment.check_student') }}" class="form-inline mr-2 mb-2">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group mr-2">
+                  <label for="reg_no" class="mr-2">Reg No:</label>
+                  <input type="text" name="reg_no" id="reg_no" class="form-control" placeholder="Enter Reg No">
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Search Student</button>
+              </form>
+
+              <!-- Export to Excel Button -->
+              <button id="exportExcelButton" class="btn btn-primary btn-sm" disabled>Export to Excel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-container">
+              <table id="dataTable" class="table table-bordered table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th class="fixed-column">Reg No</th>
+                    <th class="fixed-column">Subject</th>
+                    <th class="fixed-column">Term</th>
+                    <th class="fixed-column">Student Name</th>
+                    {% for assessor in assessors %}
+                    <th>{{ assessor }}</th>
+                    {% endfor %}
+                    <th>Average Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for student in data %}
+                  <tr>
+                    <td class="fixed-column">{{ student.reg_no }}</td>
+                    <td class="fixed-column">{{ student.subject }}</td>
+                    <td class="fixed-column">{{ student.term }}</td>
+                    <td class="fixed-column">{{ student.student_name }}</td>
+                    {% for assessor in assessors %}
+                    <td>{{ student.get(assessor, 'Not Assessed') }}</td>
+                    {% endfor %}
+                    <td>{{ student.average_marks | round(2) if student.average_marks is not none else 'Not Assessed' }}</td>
+                  </tr>
+                  {% else %}
+                  <tr><td colspan="{{ assessors|length + 5 }}">No data found for the selected filters.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Required JS Libraries -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/js/adminlte.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+  $(function () {
+    // Initialize Select2
+    $('.select2').select2();
+
+    // Initialize DataTable with FixedColumns
+    var table = $("#dataTable").DataTable({
+      autoWidth: false,
+      paging: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      lengthChange: true,
+      scrollX: true,
+      scrollY: "300px",
+      scrollCollapse: true,
+      fixedColumns: { left: 4 },
+      initComplete: checkTableData
+    });
+
+    // Enable export button if data exists
+    function checkTableData() {
+      $('#exportExcelButton').prop('disabled', $("#dataTable tbody tr").length === 0);
+    }
+
+    table.on('draw', checkTableData);
+
+    $('#exportExcelButton').click(function (e) {
+      e.preventDefault();
+      exportTableToExcel();
+    });
+  });
+
+  function exportTableToExcel() {
+    var table = document.getElementById('dataTable');
+    var wb = XLSX.utils.table_to_book(table, { sheet: 'Assessment Data' });
+    XLSX.writeFile(wb, 'assessment_report.xlsx');
+  }
+</script>
+
+<!-- Include SheetJS for Excel Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+<style>
+  .fixed-column { position: sticky; left: 0; background-color: #fff; z-index: 1; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); }
+  .table-container { overflow-x: auto; }
+  .table th { position: sticky; top: 0; background-color: #f8f9fa; z-index: 2; }
+  th, td { white-space: nowrap; }
+
+
+}
+</style>
+{% endblock javascripts %}

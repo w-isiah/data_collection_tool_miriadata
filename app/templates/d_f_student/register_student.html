@@ -1,0 +1,141 @@
+{% extends "layouts/assessor_base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+<!-- Body Class for Custom Sidebar Layout -->
+{% block body_class %}assessor_sidebar-mini{% endblock body_class %}
+
+<!-- Specific Page Stylesheets -->
+{% block stylesheets %}
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<!-- AdminLTE Theme Style -->
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<!-- Custom Styles -->
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+
+  <!-- Flash Messages Section -->
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              <strong>{{ message }}</strong>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+</div>
+</div>
+</div>
+
+<!-- Content Header Section -->
+<div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Dashboard</h1>
+      </div>
+      <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{url_for('main.index')}}">Home</a></li>
+            <li class="breadcrumb-item active">Register Student</li>
+        </ol>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Main Content Section -->
+<section class="content">
+    <div class="container-fluid">
+
+      <!-- Manage Students Card -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Register Student</h3>
+          </div>
+          <div class="card-body">
+            <form action="{{ url_for('student.register_student', student_id=student.id) }}" method="POST" class="form-horizontal">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Term Selection -->
+                <div class="form-group">
+                    <label for="term">Select Term:</label>
+                    <select name="term_id" id="term" class="form-control select2" required>
+                        {% for term in terms %}
+                        <option value="{{ term.id }}" {% if term.id == student.term_id %}selected{% endif %}>
+                            {{ term.term }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-end">
+                    <button type="submit" id="submitBtn" class="btn btn-success">Update Term</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+
+{% endblock content %}
+
+<!-- Page Specific Scripts -->
+{% block javascripts %}
+<!-- jQuery -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/assets/js/adminlte.js"></script>
+<!-- Tooltip JS -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap-tooltip.min.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+      "paging": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "lengthChange": true,
+  });
+
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock javascripts %}

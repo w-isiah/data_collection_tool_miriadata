@@ -1,0 +1,155 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %} Add School {% endblock %}
+
+{% block body_class %} moderator_sidebar-mini {% endblock body_class %}
+
+{% block stylesheets %}
+<!-- Include necessary stylesheets -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/daterangepicker/daterangepicker.css">
+<link rel="stylesheet" href="/static/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <!-- Flash messages -->
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Content Header -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Advanced Form: Add School</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+              <li class="breadcrumb-item active">Add School</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="card card-default">
+          <div class="card-header">
+            <h3 class="card-title">Add School</h3>
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+              <button type="button" class="btn btn-tool" data-card-widget="remove">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <form action="{{ url_for('schools.add_schools') }}" method="POST" class="form-horizontal">
+                  <!-- CSRF Token for security -->
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                  <fieldset>
+                    <legend>School Details</legend>
+
+                    <!-- School Name -->
+                    <div class="form-group">
+                      <label for="name">School Name:</label>
+                      <input type="text" id="name" name="name" class="form-control" placeholder="Enter School Name" required />
+                    </div>
+
+                    <!-- School Category -->
+                    <div class="form-group">
+                      <label for="category_id">Category:</label>
+                      <select name="category_id" id="category_id" class="form-control select2" required>
+                        <option value="" selected disabled="selected">Select a Category</option>
+                        {% for category in categories %}
+                          <option value="{{ category.id }}">{{ category.category_name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-group">
+                      <label for="address">Address:</label>
+                      <textarea id="address" name="address" class="form-control" placeholder="Enter School Address"></textarea>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                      <label for="description">Description:</label>
+                      <textarea id="description" name="description" class="form-control" placeholder="Enter Description"></textarea>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="form-group">
+                      <label for="contact">Contact Info:</label>
+                      <input type="text" id="contact" name="contact" class="form-control" placeholder="Enter Contact Info" />
+                    </div>
+
+                  </fieldset>
+
+                  <!-- Form Action Buttons -->
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Include necessary scripts -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/select2/js/select2.full.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+<script src="/static/assets/js/demo.js"></script>
+
+<script>
+  $(function () {
+    // Initialize Select2 for dropdowns
+    $('.select2').select2();
+  });
+</script>
+{% endblock javascripts %}

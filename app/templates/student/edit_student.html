@@ -1,0 +1,264 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+<!-- Body Class for Custom Sidebar Layout -->
+{% block body_class %}moderator_sidebar-mini{% endblock body_class %}
+
+<!-- Specific Page Stylesheets -->
+{% block stylesheets %}
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<!-- AdminLTE Theme Style -->
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<!-- Custom Styles -->
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+<!-- Select2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+
+  <!-- Flash Messages Section -->
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  <strong>{{ message }}</strong>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Header Section -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Dashboard</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{url_for('main.index')}}">Home</a></li>
+            <li class="breadcrumb-item active">Students</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Section -->
+  <section class="content">
+    <div class="container-fluid">
+
+      <!-- Manage Students Card -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Edit Student Data</h3>
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="m-0">Student Data</h5>
+                <a href="{{ url_for('student.manage_student') }}" class="btn btn-primary btn-sm">
+                  <i class="fas fa-user-plus"></i> View Students
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Students List Table -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header"></div>
+            
+            <!-- Widget Content for the Form -->
+            <div class="card-body">
+              <form action="{{ url_for('student.edit_student', student_id=student.id) }}" method="POST" class="form-horizontal">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Student Details Section -->
+                <fieldset>
+                  <legend>Student Teacher Details</legend>
+
+                  <!-- Student Teacher Input -->
+                  <div class="form-group">
+                    <label for="student_teacher">Student Teacher:</label>
+                    <input type="text" id="student_teacher" name="student_teacher" class="form-control" 
+                    value="{{ student.student_teacher }}" required />
+                  </div>
+
+                  <!-- School Selection -->
+                  <div class="form-group">
+                    <label for="school_id">School:</label>
+                    <select name="school_id" id="school_id" class="form-control select2" required>
+                      {% for school in schools %}
+                      <option value="{{ school.id }}" {% if school.id == student.school_id %}selected{% endif %}>
+                        {{ school.name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <!-- Term Selection -->
+                  <div class="form-group">
+                    <label for="term">Semester:</label>
+                    <select name="term_id" id="term" class="form-control select2" required>
+                      {% for term in terms %}
+                      <option value="{{ term.id }}" {% if term.id == student.term_id %}selected{% endif %}>
+                        {{ term.term }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <!-- Programme Selection -->
+                  <div class="form-group">
+                    <label for="programme">Programme:</label>
+                    <select name="programme_id" id="programme" class="form-control select2" required>
+                      {% for programme in programmes %}
+                      <option value="{{ programme.id }}" {% if programme.id == student.programme_id %}selected{% endif %}>
+                        {{ programme.programme_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <!-- Registration Number Input -->
+                  <div class="form-group">
+                    <label for="reg_no">Registration No:</label>
+                    <input type="text" id="reg_no" name="reg_no" class="form-control" value="{{ student.reg_no }}" required />
+                  </div>
+
+                  <!-- Subject Input -->
+                  <div class="form-group">
+                    <label for="subject">Subject:</label>
+                    <input type="text" id="subject" name="subject" class="form-control" value="{{ student.subject }}" />
+                  </div>
+
+                  <!-- Class Input -->
+                  <div class="form-group">
+                    <label for="class">Class:</label>
+                    <input type="text" id="class" name="class" class="form-control" value="{{ student.class_name }}" />
+                  </div>
+
+                  <!-- Teaching Time Input -->
+                  <div class="form-group">
+                    <label for="teaching_time">Teaching Time:</label>
+                    <input type="datetime-local" id="teaching_time" name="teaching_time" class="form-control" value="{{ student.teaching_time}}" />
+                  </div>
+
+                  <!-- Topic Input -->
+                  <div class="form-group">
+                    <label for="topic">Topic:</label>
+                    <input type="text" id="topic" name="topic" class="form-control" value="{{ student.topic }}" />
+                  </div>
+
+                  <!-- Subtopic Input -->
+                  <div class="form-group">
+                    <label for="subtopic">Subtopic:</label>
+                    <input type="text" id="subtopic" name="subtopic" class="form-control" value="{{ student.subtopic }}" />
+                  </div>
+
+                  <!-- Academic Year Selection -->
+                  <div class="form-group">
+                    <label for="academic_year_id">Academic Year:</label>
+                    <select name="academic_year_id" id="academic_year_id" class="form-control select2" required>
+                      {% for academic_year in academic_years %}
+                      <option value="{{ academic_year.id }}" {% if academic_year.id == student.academic_year_id %}selected{% endif %}>
+                        {{ academic_year.academic_year }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <!-- Study Year Selection -->
+                  <div class="form-group">
+                    <label for="study_year_id">Study Year:</label>
+                    <select name="study_year_id" id="study_year_id" class="form-control select2" required>
+                      {% for study_year in study_years %}
+                      <option value="{{ study_year.id }}" {% if study_year.id == student.study_year_id %}selected{% endif %}>
+                        {{ study_year.study_year }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                </fieldset>
+
+                <!-- Form Action Buttons -->
+                <div class="d-flex justify-content-end">
+                  <button type="submit" id="submitBtn" class="btn btn-success">Update</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+{% endblock content %}
+
+<!-- Page Specific Scripts -->
+{% block javascripts %}
+<!-- jQuery -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/assets/js/adminlte.js"></script>
+<!-- Tooltip JS -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap-tooltip.min.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+  $(function () {
+    // Initialize Select2 for select elements
+    $('.select2').select2();
+
+    $("#example1").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+      "paging": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "lengthChange": true,
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+{% endblock javascripts %}

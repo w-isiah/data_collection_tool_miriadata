@@ -1,0 +1,195 @@
+{% extends "layouts/assessor_base.html" %}
+
+{% block title %}Edit Score{% endblock %}
+
+{% block body_class %}assessor_sidebar-mini{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/daterangepicker/daterangepicker.css">
+<link rel="stylesheet" href="/static/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+<style>
+    .aspect-label {
+        font-size: 1.25rem; 
+        font-weight: 600; 
+        color: #4B8F29; 
+        background-color: #eaf0e1; 
+        border-radius: 5px; 
+        padding: 8px 15px; 
+        display: inline-block;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+        margin-bottom: 15px;
+    }
+
+    .mark-score {
+        color: #28a745; 
+        font-size: 1.5rem; 
+        font-weight: 700; 
+    }
+
+    .aspect-label:hover {
+        background-color: #cfe9b0; 
+        cursor: pointer;
+    }
+
+    .form-group label {
+        font-weight: 500;
+        font-size: 1rem;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+
+    .btn-group {
+        margin-top: 20px;
+    }
+
+    .alert-container {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="container-fluid">
+        <!-- Flash Messages -->
+        <div class="row mb-2">
+            <div class="col-12">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+
+        <!-- Breadcrumbs -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Edit Score</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                            <li class="breadcrumb-item active">Edit Score</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Score Edit Form -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="card card-default">
+                    <div class="card-header">
+                        <h3 class="card-title">Edit Score</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% if record %}
+                                <div class="form-group">
+                                    <label for="aspect_name" class="aspect-label">
+                                        <span class="mark-score">{{ mark_score.marks }}%</span>
+                                    </label>
+                                </div>
+
+                                <form action="{{ url_for('scores.edit_score', marks_scores_sku=marks_scores_sku) }}" method="POST">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                                    {% for related_record in record %}
+                                    <!-- Hidden input for criteria_id -->
+                                    <input type="hidden" name="criteria_id[]" value="{{ related_record.criteria_id }}">
+
+                                    <div class="form-group">
+                                        <label for="aspect_name">Aspect</label>
+                                        <input type="text" class="form-control" id="aspect_name" value="{{ related_record.aspect_name }} {{ related_record.aspect_description }}" disabled>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="criteria_name">Assessment Criteria</label>
+                                        <input type="text" class="form-control" id="criteria_name" value="{{ related_record.criteria_name }}" disabled>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="score_{{ related_record.criteria_id }}">Score</label>
+                                        <input type="number" class="form-control" id="score_{{ related_record.criteria_id }}" name="score[]" value="{{ related_record.score_mark }}" min="0" max="5" required>
+
+                                        <!-- Visible Comment/Description -->
+                                        <small class="form-text text-muted">
+                                            Please enter a score between 0 and 5. A higher score indicates better performance.
+                                        </small>
+                                    </div>
+                                    {% endfor %}
+
+                                    <!-- Comment Section -->
+                                    <div class="form-group row">
+                                        <label for="comment" class="col-sm-3 col-form-label">Comment:</label>
+                                        <div class="col-sm-9">
+                                            <textarea name="comment" id="comment" class="form-control" rows="4" >{{ comment.comment }}</textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <button type="submit" class="btn btn-primary">Update Score</button>
+                                        <a href="{{ url_for('scores.view_scores', marks_scores_sku=marks_scores_sku) }}" class="btn btn-secondary">Cancel</a>
+                                    </div>
+                                </form>
+                                {% else %}
+                                <p>No score record found.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/select2/js/select2.full.min.js"></script>
+<script src="/static/assets/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+<script src="/static/assets/plugins/moment/moment.min.js"></script>
+<script src="/static/assets/plugins/inputmask/jquery.inputmask.min.js"></script>
+<script src="/static/assets/plugins/daterangepicker/daterangepicker.js"></script>
+<script src="/static/assets/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<script src="/static/assets/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<script src="/static/assets/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+<script src="/static/assets/js/demo.js"></script>
+<script src="/static/assets/js/pages/dashboard.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+
+<script>
+    $(function () {
+        $('.select2').select2();
+    });
+</script>
+{% endblock %}

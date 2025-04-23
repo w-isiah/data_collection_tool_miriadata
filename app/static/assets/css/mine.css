@@ -1,0 +1,36 @@
+<style>
+  .alert {
+    font-size: 14px; /* Reduces font size */
+    padding: 8px 15px; /* Reduces padding */
+    margin-bottom: 10px; /* Adds space below the message */
+    border-radius: 5px; /* Optional: smooth rounded corners */
+    max-width: 500px; /* Optional: limits the width of the alert */
+    width: 100%; /* Makes sure the alert is responsive */
+  }
+
+  .alert p {
+    margin: 0; /* Removes default margin from the paragraph */
+  }
+
+  /* Optional: Different colors for different types of alerts */
+  .alert-info {
+    background-color: #d9edf7;
+    color: #31708f;
+  }
+
+  .alert-success {
+    background-color: #dff0d8;
+    color: #3c763d;
+  }
+
+  .alert-warning {
+    background-color: #fcf8e3;
+    color: #8a6d3b;
+  }
+
+  .alert-danger {
+    background-color: #f2dede;
+    color: #a94442;
+  }
+</style>
+

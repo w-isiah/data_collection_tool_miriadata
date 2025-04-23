@@ -1,0 +1,119 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %} Add Aspect Question {% endblock %}
+
+{% block body_class %} moderator_sidebar-mini {% endblock %}
+
+{% block stylesheets %}
+<!-- Include necessary stylesheets -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <!-- Flash messages -->
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  <strong>{{ message }}</strong>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Content Header -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Add Aspect Question</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{url_for('main.index')}}">Home</a></li>
+              <li class="breadcrumb-item active">Add New Aspect Question</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="card card-default">
+          <div class="card-header">
+            <h3 class="card-title">Add Aspect Question</h3>
+          </div>
+          <div class="card-body">
+            <form action="{{ url_for('aspect_qns_bp.add_aspect_question') }}" method="POST">
+              <!-- CSRF Token for security -->
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+              <div class="row">
+                <div class="col-md-8 offset-md-2">
+
+                  <!-- Criteria Name -->
+                  <div class="form-group">
+                    <label for="criteria_name">Criteria Name</label>
+                    <input type="text" id="criteria_name" name="criteria_name" class="form-control" placeholder="Enter Criteria Name" required>
+                  </div>
+
+                  <!-- Aspect -->
+                  <div class="form-group">
+                    <label for="aspect_id">Aspect</label>
+                    <select name="aspect_id" id="aspect_id" class="form-control select2" required>
+                      <option value="" disabled selected>Select Aspect</option>
+                      {% for aspect in aspects %}
+                        <option value="{{ aspect.aspect_id }}">{{ aspect.aspect_name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <!-- Form Buttons -->
+                  <div class="form-group text-center">
+                    <button type="submit" class="btn btn-success btn-sm">Submit</button>
+                    <button type="reset" class="btn btn-secondary btn-sm">Reset</button>
+                  </div>
+
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/select2/js/select2.full.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+
+<script>
+  $(function () {
+    // Initialize Select2 for dropdowns
+    $('.select2').select2();
+  });
+</script>
+{% endblock javascripts %}

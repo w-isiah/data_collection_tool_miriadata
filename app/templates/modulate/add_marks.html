@@ -1,0 +1,179 @@
+{% extends "layouts/assessor_base.html" %}
+
+{% block title %} Add Marks {% endblock %}
+
+{% block body_class %} assessor_sidebar-mini {% endblock body_class %}
+
+{% block stylesheets %}
+<!-- Include necessary stylesheets -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/daterangepicker/daterangepicker.css">
+<link rel="stylesheet" href="/static/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <!-- Flash messages -->
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Content Header -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Advanced Form: Add Marks</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{url_for('main.index')}}">Home</a></li>
+              <li class="breadcrumb-item active">Add Marks</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="card card-default">
+          <div class="card-header">
+            <h3 class="card-title">Add Marks</h3>
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+              <button type="button" class="btn btn-tool" data-card-widget="remove">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <form action="{{ url_for('marks.add_marks') }}" method="POST" class="form-horizontal">
+                  <!-- CSRF Token for security -->
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                  <fieldset>
+                    <legend>Marks Details</legend>
+
+                    <!-- Student Selection -->
+                    <div class="form-group">
+                      <label for="student">Student:</label>
+                      <select name="student_id" id="student" class="form-control select2" required>
+                       <option value="" selected disabled="selected">Select a Student</option>
+                       {% for student in students %}
+                       <option value="{{ student.id }}">{{ student.student_teacher }}</option>
+                       {% endfor %}
+                     </select>
+                   </div>
+
+                   <!-- Assessor Selection -->
+                   <div class="form-group">
+                     <label for="assessor">Assessor:</label>
+                     <select name="assessor_id" id="assessor" class="form-control select2" required>
+                       <option value="" selected disabled="selected">Select an Assessor</option>
+                       {% for assessor in assessors %}
+                       <option value="{{ assessor.id }}">{{ assessor.name }}</option>
+                       {% endfor %}
+                     </select>
+                   </div>
+
+                   <!-- School Selection -->
+                   <div class="form-group">
+                     <label for="school">School:</label>
+                     <select name="school_id" id="school" class="form-control select2" required>
+                       <option value="" selected disabled="selected">Select a School</option>
+                       {% for school in schools %}
+                       <option value="{{ school.id }}">{{ school.name }}</option>
+                       {% endfor %}
+                     </select>
+                   </div>
+
+                   <!-- Marks -->
+                   <div class="form-group">
+                     <label for="marks">Marks:</label>
+                     <input type="number" id="marks" name="marks" class="form-control" placeholder="Enter Marks" required min="0" max="100" />
+                   </div>
+
+                   <!-- Assessment Type -->
+              
+                     <input type="text" id="assessment_type" name="assessment_type" hidden value="manual" class="form-control" />
+                  
+
+                   <!-- Date Awarded -->
+                   <div class="form-group">
+                     <label for="date_awarded">Date Awarded:</label>
+                     <input type="date" id="date_awarded" name="date_awarded" class="form-control" required />
+                   </div>
+
+                 </fieldset>
+
+                 <!-- Form Action Buttons -->
+                 <div class="form-group">
+                   <button type="submit" class="btn btn-success">Submit</button>
+                   <button type="reset" class="btn btn-secondary">Reset</button>
+                 </div>
+               </form>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </section>
+ </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Include necessary scripts -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/select2/js/select2.full.min.js"></script>
+<script src="/static/assets/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+<script src="/static/assets/plugins/moment/moment.min.js"></script>
+<script src="/static/assets/plugins/inputmask/jquery.inputmask.min.js"></script>
+<script src="/static/assets/plugins/daterangepicker/daterangepicker.js"></script>
+<script src="/static/assets/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<script src="/static/assets/plugins/tempusdominus-bootstrap-4/js/regtempusdominus-bootstrap-4.min.js"></script>
+<script src="/static/assets/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+<script src="/static/assets/js/demo.js"></script>
+<script src="/static/assets/js/pages/dashboard.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+
+<script>
+  $(function () {
+    // Initialize Select2 for dropdowns
+    $('.select2').select2();
+  });
+</script>
+{% endblock javascripts %}

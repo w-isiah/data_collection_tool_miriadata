@@ -1,0 +1,157 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %}Manage Terms{% endblock %}
+
+{% block body_class %}moderator_sidebar-mini{% endblock body_class %}
+
+{% block stylesheets %}
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<!-- AdminLTE Theme Style -->
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<!-- Custom Styles -->
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+{% endblock %}
+
+{% block content %}
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+
+  <!-- Flash Messages Section -->
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  <strong>{{ message }}</strong>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Header Section -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Semester Management</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item active">Semester List</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Section -->
+  <section class="content">
+    <!-- Add Term Button -->
+    <div class="row mb-3">
+      <div class="col-12">
+        <a href="{{ url_for('terms.add_term') }}" class="btn btn-primary">
+          <i class="fas fa-plus-circle"></i> Add Semester
+        </a>
+      </div>
+    </div>
+
+    <!-- Terms List Table -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Semester List</h3>
+          </div>
+          <div class="card-body">
+            <table id="termsTable" class="table table-bordered table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Semester</th>
+                 
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for term in terms %}
+                  <tr>
+                    <td>{{ term.term }}</td>
+                   
+                    <td>
+                      <div class="btn-group" role="group">
+                        <a href="{{ url_for('terms.edit_term', term_id=term.id) }}" 
+                           class="btn btn-warning btn-sm" 
+                           data-toggle="tooltip" title="Edit Term">
+                          <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{{ url_for('terms.delete_term', term_id=term.id) }}" 
+                           class="btn btn-danger btn-sm" 
+                           data-toggle="tooltip" title="Delete Term" 
+                           onclick="return confirm('Are you sure you want to delete this term?');">
+                          <i class="fas fa-trash"></i> Delete
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<!-- jQuery -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/assets/js/adminlte.js"></script>
+<!-- Tooltip JS -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap-tooltip.min.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+
+<script>
+  $(function () {
+    // Initialize DataTable
+    $("#termsTable").DataTable({
+      responsive: true,
+      autoWidth: false,
+      paging: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      lengthChange: true
+    });
+
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "layouts/assessor_base.html" %}
+
+{% block title %}Evaluation Summary{% endblock %}
+
+{% block body_class %}assessor_sidebar-mini{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+<style>
+    /* Styling for the general comment */
+    .general-comment {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .general-comment strong {
+        font-size: 1.1rem;
+        color: #007bff;
+    }
+
+    /* Table hover effect */
+    #example1 tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Styling for no comment text */
+    .no-comment {
+        font-style: italic;
+        color: #999;
+    }
+
+    /* Responsive improvements for the table */
+    @media (max-width: 768px) {
+        .table th, .table td {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="container-fluid">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Evaluation Summary</h3>
+                    <div class="card-tools">
+                        <button class="btn btn-tool" data-widget="collapse"><i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Display general comment in a styled box -->
+                    <div class="general-comment">
+                        <strong>General Comment: </strong> 
+                        {% if comment %}
+                             <strong> {{ comment.comment }} </strong>
+                        {% else %}
+                            <span class="no-comment">No comment available.</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="general-comment">
+                        <strong>Mark  </strong> 
+                        {% if comment %}
+                             <strong> {{ mark_score.marks }}% </strong>
+                        {% else %}
+                            <span class="no-comment">No Mark available.</span>
+                        {% endif %}
+                    </div>
+
+
+
+                    <!-- Scores table -->
+                    <table id="example1" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Criteria</th>
+                                <th>Score</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in saved_data %}
+                            <tr>
+                                <td>{{ record.aspect_name }}</td>
+                                <td>{{ record.criteria_name }}</td>
+                                <td>{{ record.score }}</td>
+                                
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No data available.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/static/assets/js/adminlte.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+
+<script>
+  $(document).ready(function() {
+    $("#example1").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+      "paging": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "lengthChange": true
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+{% endblock javascripts %}

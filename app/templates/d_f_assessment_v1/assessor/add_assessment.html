@@ -1,0 +1,125 @@
+{% extends "layouts/assessor_base.html" %}
+
+{% block title %}Assess Student{% endblock %}
+{% block body_class %}assessor_sidebar-mini{% endblock %}
+
+{% block stylesheets %}
+<!-- Include necessary stylesheets -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <!-- Flash Messages -->
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            <strong>{{ message }}</strong>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Header -->
+    <section class="content-header">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Student Assessment</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item active">Assessment</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Assessment Form -->
+    <section class="content">
+      <div class="card card-default">
+        <div class="card-header">
+          <h3 class="card-title">Assess Student</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <center>
+                <div class="mb-4">
+                  <h4 class="text-primary font-weight-bold">Student: <span class="text-dark">{{ student.student_teacher }}</span></h4>
+                  <h5 class="text-secondary">Reg No: <span class="text-dark">{{ student.reg_no }}</span></h5>
+                </div>
+              </center>
+
+              <form action="{{ url_for('d_f_scores.save_scores') }}" method="POST">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="student_id" value="{{ student.id }}">
+                <input type="hidden" name="term_id" value="{{ student.term_id }}">
+          
+
+                <!-- Score Type Selection -->
+                <div class="form-group">
+                  <label for="score_type">Assessment Type:</label>
+                  <select name="score_type" id="score_type" class="form-control select2" required>
+                    <option value="im" {% if existing_scores and existing_scores.score_type == 'im' %}selected{% endif %}>Internal Assessment</option>
+                  </select>
+                </div>
+
+                <!-- Score Inputs -->
+                <div class="row">
+                  {% set score_fields = ["coverage", "quality", "quantity", "attractiveness", "accuracy", "grading", "relevance", "printing", "durability", "originality", "explanation", "storage"] %}
+                  {% for field in score_fields %}
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="{{ field }}">{{ field|capitalize }}:</label>
+                      <input type="number" step="0.01" min="0" max="100" name="{{ field }}" id="{{ field }}" class="form-control"
+                        value="{{ existing_scores[field] if existing_scores else '' }}" required>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+
+                <!-- Comment Field -->
+                <div class="form-group">
+                  <label for="comment">Comment:</label>
+                  <textarea name="comment" id="comment" class="form-control" rows="3" required>{{ existing_scores.comment if existing_scores else '' }}</textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center mt-4">
+                  <button type="submit" class="btn btn-success btn-lg">Save Assessment</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/select2/js/select2.full.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+
+<script>
+  $(function () {
+    $('.select2').select2();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %}Add Rating{% endblock %}
+
+{% block body_class %}moderator_sidebar-mini{% endblock %}
+
+{% block stylesheets %}
+<!-- Include necessary stylesheets for the page -->
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+
+  <!-- Content Header Section -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Add Rating</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('ratings.manage_ratings') }}">Ratings</a></li>
+            <li class="breadcrumb-item active">Add Rating</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Section -->
+  <section class="content">
+    <div class="container-fluid">
+
+      <!-- Add Rating Form -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Add Rating</h3>
+            </div>
+            <div class="card-body">
+              <!-- Display any flash messages -->
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  <div class="alert-container">
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              {% endwith %}
+
+              <!-- Form to Add Rating -->
+              <form method="POST" action="{{ url_for('ratings.add_rating') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Rating Name Field -->
+                <div class="form-group">
+                  <label for="rating_name">Rating Name</label>
+                  <input type="text" class="form-control" id="rating_name" name="rating_name" placeholder="Enter Rating Name" required>
+                </div>
+
+                <!-- Rating Description Field -->
+                <div class="form-group">
+                  <label for="rating_description">Description</label>
+                  <textarea class="form-control" id="rating_description" name="description" rows="3" placeholder="Enter Rating Description" required></textarea>
+                </div>
+
+                <!-- Rating Mark Field -->
+                <div class="form-group">
+                  <label for="rating_mark">Mark</label>
+                  <select class="form-control" id="rating_mark" name="mark" required>
+                    <option value="0">Not Observed / Applicable</option>
+                    <option value="1">Unsatisfactory</option>
+                    <option value="2">Satisfactory</option>
+                    <option value="3">Good</option>
+                    <option value="4">Very Good</option>
+                    <option value="5">Excellent</option>
+                  </select>
+                </div>
+
+                <!-- Assessment Criteria Selection -->
+                <div class="form-group">
+                  <label for="assessment_criteria_id">Criteria Question:</label>
+                  <select class="form-control select2" name="assessment_criteria_id" id="assessment_criteria_id" style="width: 100%;" required>
+                    <option value="" selected disabled="selected">Select Question</option>
+                    {% for criteria in assessment_criteria %}
+                      <option value="{{ criteria.criteria_id }}">{{ criteria.criteria_name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary">Add Rating</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Include necessary JavaScript files for the page -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+{% endblock javascripts %}

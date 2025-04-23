@@ -1,0 +1,174 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %}Assessment Dashboard{% endblock %}
+
+<!-- Body Class for Custom Sidebar Layout -->
+{% block body_class %}moderator_sidebar-mini{% endblock body_class %}
+
+<!-- Specific Page Stylesheets -->
+{% block stylesheets %}
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<!-- AdminLTE Theme Style -->
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<!-- Custom Styles -->
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12">
+        <!-- Flash Messages Section (If applicable) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  <strong>{{ message }}</strong>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Form to select Programme, Term, and Reg No -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card card-info">
+          <div class="card-header">
+            <h3 class="card-title">Filter Assessment Data</h3>
+          </div>
+          <div class="card-body">
+            <form method="POST" class="form-inline">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+              <!-- Programme Dropdown -->
+              <div class="form-group mr-2">
+                <label for="programme" class="mr-2">Programme:</label>
+                <select name="programme_id" id="programme" class="form-control">
+                  <option value="">Select Programme</option>
+                  {% for programme in programmes %}
+                    <option value="{{ programme.id }}" {% if programme.id == programme_id %} selected {% endif %}>{{ programme.programme_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Term Dropdown -->
+              <div class="form-group mr-2">
+                <label for="term" class="mr-2">Term:</label>
+                <select name="term_id" id="term" class="form-control">
+                  <option value="">Select Term</option>
+                  {% for term in terms %}
+                    <option value="{{ term.id }}" {% if term.id == term_id %} selected {% endif %}>{{ term.term }} - {{ term.year }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Registration Number Input -->
+              <div class="form-group mr-2">
+                <label for="reg_no" class="mr-2">Reg No:</label>
+                <input type="text" name="reg_no" id="reg_no" class="form-control" placeholder="Enter Reg No">
+              </div>
+
+              <button type="submit" class="btn btn-success">Search</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students Data Table -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Assessment Data</h3>
+          </div>
+          <div class="card-body">
+            <table id="assessment-table" class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>Reg No</th>
+                  <th>Student Name</th>
+                  <th>Subject</th>
+                  <th>Term</th>
+                  <th>Assessor</th>
+                  <th>Total Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if results %}
+                  {% for row in results %}
+                    <tr>
+                      <td>{{ row.reg_no }}</td>
+                      <td>{{ row.student_teacher }}</td>
+                      <td>{{ row.subject }}</td>
+                      <td>{{ row.term }}</td>
+                      <td>{{ row.assessor_username }}</td>
+                      <td>{{ row.total_score }}</td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="6">No data available for the selected filters.</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+
+<!-- Page Specific Scripts -->
+{% block javascripts %}
+<!-- jQuery -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/assets/js/adminlte.js"></script>
+<!-- Tooltip JS -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap-tooltip.min.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+
+<script>
+  $(function () {
+    // Initialize DataTable
+    $("#assessment-table").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+      "paging": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "lengthChange": true,
+    });
+
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+{% endblock javascripts %}

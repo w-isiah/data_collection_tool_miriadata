@@ -1,0 +1,158 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %}
+  Assessment Report{% if assessors|length > 0 %} - Assessed by {{ assessors[0] }}{% endif %}
+{% endblock title %}
+
+{% block body_class %}moderator_sidebar-mini{% endblock body_class %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  <strong>{{ message }}</strong>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card card-info">
+          <div class="card-header">
+            <h3 class="card-title">Filter Assessment Data</h3>
+          </div>
+          <div class="card-body">
+            <form method="POST" class="form-inline">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+              <!-- Programme Dropdown -->
+              <div class="form-group mr-2">
+                <label for="programme" class="mr-2">Programme:</label>
+                <select name="programme_id" id="programme" class="form-control">
+                  <option value="">Select Programme</option>
+                  {% for programme in programmes %}
+                    <option value="{{ programme.id }}" {% if programme.id == programme_id %} selected {% endif %}>{{ programme.programme_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Term Dropdown -->
+              <div class="form-group mr-2">
+                <label for="term" class="mr-2">Term:</label>
+                <select name="term_id" id="term" class="form-control">
+                  <option value="">Select Term</option>
+                  {% for term in terms %}
+                    <option value="{{ term.id }}" {% if term.id == term_id %} selected {% endif %}>{{ term.term }} - {{ term.year }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Registration Number Input -->
+              <div class="form-group mr-2">
+                <label for="reg_no" class="mr-2">Reg No:</label>
+                <input type="text" name="reg_no" id="reg_no" class="form-control" placeholder="Enter Reg No">
+              </div>
+
+              <button type="submit" class="btn btn-success">Search</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assessment Data Table -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Assessment Data</h3>
+          </div>
+          <div class="card-body">
+            <form method="POST">
+              <button type="submit" name="export_excel" class="btn btn-primary">Export to Excel</button>
+            </form>
+            <table id="assessment-table" class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>Reg No</th>
+                  <th>Student Name</th>
+                  <th>Subject</th>
+                  <th>Term</th>
+                  <th>Total Score</th>
+                  {% for assessor in assessors %}
+                    <th>{{ assessor }}</th>
+                  {% endfor %}
+                  <th>Average Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for student in data %}
+                  <tr>
+                    <td>{{ student.reg_no }}</td>
+                    <td>{{ student.student_teacher }}</td>
+                    <td>{{ student.subject }}</td>
+                    <td>{{ student.term }}</td>
+                    <td>{{ student.total_score }}</td>
+                    {% for assessor in assessors %}
+                      <td>{{ student[assessor] }}</td>
+                    {% endfor %}
+                    <td>{{ student.average_score }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/static/assets/js/adminlte.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+
+<script>
+  $(function () {
+    $("#assessment-table").DataTable({
+      "responsive": true,
+      "autoWidth": false,
+      "paging": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "lengthChange": true,
+    });
+  });
+</script>
+{% endblock javascripts %}

@@ -1,0 +1,172 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %} Add Assessment {% endblock %}
+
+{% block body_class %} moderator-sidebar-mini {% endblock %}
+
+{% block stylesheets %}
+<!-- External Stylesheets for Better Layout and UI -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/static/assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="container-fluid">
+
+    <!-- Flash Messages -->
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  <strong>{{ message }}</strong>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Assessment</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+              <li class="breadcrumb-item active">Assessment Data</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="card card-default">
+          <div class="card-header">
+            <h3 class="card-title">Check Student's Assessment</h3>
+          </div>
+          <div class="card-body">
+
+            <!-- Student Information Form -->
+            <div class="box box-primary">
+              <div class="box-body">
+                <form method="POST" action="{{ url_for('modulate.check_student') }}">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <div class="form-group">
+                    <label for="reg_no">Student Registration Number</label>
+                    <input type="text" class="form-control" id="reg_no" name="reg_no" placeholder="Enter Registration No" required>
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+                    <button type="reset" class="btn btn-default btn-sm">Reset</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Displaying Student Details and Assessment Results -->
+            {% if student %}
+              <div class="box box-info">
+                <div class="box-body">
+                  <h3>Student Details</h3>
+                  <table class="table table-bordered table-striped">
+                    <tr>
+                      <th>Registration Number</th>
+                      <td>{{ student.reg_no }}</td>
+                    </tr>
+                    <tr>
+                      <th>Student Teacher</th>
+                      <td>{{ student.student_teacher }}</td>
+                    </tr>
+                  </table>
+
+                  <!-- Message for Not Assessed -->
+                  {% if message %}
+                    <div class="alert alert-warning">{{ message }}</div>
+                    <h4>Assessment:  
+                      <a href="{{ url_for('modulate.assess_v1', student_id=student.id) }}" class="btn btn-warning btn-sm">
+                        <i class="icon-edit"></i> Assess Now
+                      </a>
+                    </h4>
+                  {% else %}
+                    <h3>Assessment Results</h3>
+                    {% if results %}
+                      {% for result in results %}
+                        <div class="box box-info">
+                          <div class="box-body">
+                            <h4>Term {{ result.term_id }}</h4>
+
+                            {% if result.message == 'Not Assessed' %}
+                              <p>Status: <span class="status-false">Not Assessed</span></p>
+                              <h4>Assessment:  
+                                <a href="{{ url_for('modulate.assess_v1', student_id=student.id) }}" class="btn btn-warning btn-sm">
+                                  <i class="icon-edit"></i> Assess Now
+                                </a>
+                              </h4>
+                            {% else %}
+                              <table class="table table-bordered table-striped">
+                                <tr>
+                                  <th>Marks</th>
+                                  <td>{{ result.marks }}</td>
+                                </tr>
+                                <tr>
+                                  <th>Assessment Type</th>
+                                  <td>{{ result.assessment_type }}</td>
+                                </tr>
+                                <tr>
+                                  <th>Date Awarded</th>
+                                  <td>{{ result.date_awarded }}</td>
+                                </tr>
+                              </table>
+                            {% endif %}
+                          </div>
+                        </div>
+                      {% endfor %}
+                    {% else %}
+                      <p>No assessment results available for this student.</p>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            {% else %}
+              <p>No student found with the given registration number or assessment results.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block javascripts %}
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/select2/js/select2.full.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+
+<script>
+  $(function () {
+    // Initialize Select2 for dropdowns if needed
+    $('.select2').select2();
+  });
+</script>
+{% endblock %}
