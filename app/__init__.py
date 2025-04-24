@@ -47,10 +47,12 @@ from app.academic_year.academic_year import academic_year_bp
 from app.study_year.study_year import study_year_bp
 from app.db_bk.db_bk import db_bk_bp
 from app.districts.districts import districts_bp
+from app.demo_data.demo_data import demo_data_bp
 
 
 
 # Register blueprints
+app.register_blueprint(demo_data_bp,url_prefix='/demo_data')
 app.register_blueprint(districts_bp,url_prefix='/districts')
 app.register_blueprint(db_bk_bp,url_prefix='/db_bk')
 app.register_blueprint(study_year_bp,url_prefix='/study_year')

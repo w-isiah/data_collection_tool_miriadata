@@ -1,55 +1,45 @@
 {% extends "layouts/moderator_base.html" %}
 
 {% block title %}List of Schools{% endblock %}
-
 {% block body_class %}moderator_sidebar-mini{% endblock %}
 
 {% block stylesheets %}
-<!-- Google Font: Source Sans Pro -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-<!-- Font Awesome -->
 <link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
-<!-- DataTables CSS -->
 <link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-<!-- AdminLTE Theme Style -->
 <link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
-<!-- Custom Styles -->
 <link rel="stylesheet" href="/static/assets/css/mine.css">
 {% endblock %}
 
 {% block content %}
-<!-- Content Wrapper -->
 <div class="content-wrapper">
-
-  <!-- Flash Messages Section -->
   <div class="container-fluid">
-    <div class="row mb-2">
-      <div class="col-12">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="row mb-2">
+          <div class="col-12">
             <div class="alert-container">
               {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                  <strong>{{ message }}</strong>
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+              </div>
               {% endfor %}
             </div>
-          {% endif %}
-        {% endwith %}
-      </div>
-    </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
   </div>
 
-  <!-- Content Header Section -->
+  <!-- Page Header -->
   <div class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0 text-dark">Schools List</h1>
+          <h1 class="m-0">List of Schools</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -61,20 +51,23 @@
     </div>
   </div>
 
-  <!-- Main Content Section -->
+  <!-- School Table -->
   <section class="content">
     <div class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Schools List</h3>
+            <h3 class="card-title">Registered Schools</h3>
           </div>
           <div class="card-body">
-            <table id="schoolsTable" class="table table-bordered table-striped table-hover">
+            <table id="schoolsTable" class="table table-bordered table-striped">
               <thead>
                 <tr>
                   <th>Name</th>
                   <th>Category</th>
+                  <th>District</th>
+                  <th>Region</th>
+                  <th>Country</th>
                   <th>Address</th>
                   <th>Description</th>
                   <th>Contact</th>
@@ -83,24 +76,27 @@
               </thead>
               <tbody>
                 {% for school in schools %}
-                  <tr>
-                    <td>{{ school.name }}</td>
-                    <td>{{ school.category_name }}</td>
-                    <td>{{ school.address }}</td>
-                    <td>{{ school.description }}</td>
-                    <td>{{ school.contact }}</td>
-                    <td>
-                      <div class="btn-group" role="group">
-                        <a href="{{url_for('schools.edit_schools',school_id=school.id)}}" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Edit School">
-                          <i class="fas fa-edit"></i> Edit
-                        </a>
-                        <a href="{{url_for('schools.delete_schools',school_id=school.id)}}" class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete School" 
-                           onclick="return confirm('Are you sure you want to delete this school?');">
-                          <i class="fas fa-trash"></i> Delete
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
+                <tr>
+                  <td>{{ school.name }}</td>
+                  <td>{{ school.category_name }}</td>
+                  <td>{{ school.district_name }}</td>
+                  <td>{{ school.region }}</td>
+                  <td>{{ school.country }}</td>
+                  <td>{{ school.address }}</td>
+                  <td>{{ school.description }}</td>
+                  <td>{{ school.contact }}</td>
+                  <td>
+                    <div class="btn-group">
+                      <a href="{{ url_for('schools.edit_schools', school_id=school.id) }}" class="btn btn-sm btn-warning" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{{ url_for('schools.delete_schools', school_id=school.id) }}" class="btn btn-sm btn-danger" title="Delete"
+                         onclick="return confirm('Are you sure you want to delete this school?');">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -109,28 +105,22 @@
       </div>
     </div>
   </section>
-
 </div>
 {% endblock %}
 
 {% block javascripts %}
-<!-- jQuery -->
 <script src="/static/assets/plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
 <script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables JS -->
 <script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
 <script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
 <script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-<!-- AdminLTE App -->
-<script src="/static/assets/js/adminlte.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
 <script src="/static/assets/js/mine.js"></script>
 
 <script>
   $(function () {
-    // Initialize DataTable
-    $("#schoolsTable").DataTable({
+    $('#schoolsTable').DataTable({
       responsive: true,
       autoWidth: false,
       paging: true,
@@ -140,7 +130,6 @@
       lengthChange: true
     });
 
-    // Initialize tooltips
     $('[data-toggle="tooltip"]').tooltip();
   });
 </script>

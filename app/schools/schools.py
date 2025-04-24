@@ -11,34 +11,43 @@ schools_bp = Blueprint('schools', __name__)
 def add_schools():
     if request.method == 'POST':
         category_id = request.form['category_id']
+        district_id = request.form['district_id']  # fixed typo
         name = request.form['name']
         address = request.form['address']
         description = request.form['description']
         contact = request.form['contact']
 
-        # Insert school data into the schools table
+        # Insert school data
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO schools (category_id, name, address, description, contact)
-            VALUES (%s, %s, %s, %s, %s)
-        ''', (category_id, name, address, description, contact))
+            INSERT INTO schools (category_id, name, address, description, contact, district_id)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        ''', (category_id, name, address, description, contact, district_id))
         conn.commit()
         cursor.close()
         conn.close()
 
         flash('School added successfully!', 'success')
-        return redirect(url_for('schools.add_schools'))  # Make sure to redirect to the correct route
+        return redirect(url_for('schools.add_schools'))
 
-    # Fetch categories from the school_category table to populate the dropdown
+    # Fetch dropdown data
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute('SELECT * FROM school_category')
     categories = cursor.fetchall()
+    cursor.execute('SELECT * FROM districts')
+    districts = cursor.fetchall()
     cursor.close()
     conn.close()
 
-    return render_template('schools/add_schools.html', username=session['username'], role=session['role'], categories=categories)
+    return render_template(
+        'schools/add_schools.html',
+        username=session['username'],
+        role=session['role'],
+        categories=categories,
+        districts=districts
+    )
 
 
 
@@ -86,21 +95,53 @@ def edit_schools(school_id):
 
     return render_template('schools/edit_schools.html',username=session['username'],role=session['role'], school=school, categories=categories)
 
+
+
+
+
+
+
+
 @schools_bp.route('/manage_schools', methods=['GET'])
 def manage_schools():
-    # Fetch all schools from the schools table
+    # Fetch all schools with their category and district info
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute('''
-        SELECT schools.id, schools.name, schools.address, schools.description, schools.contact, school_category.category_name
+        SELECT 
+            schools.id,
+            schools.name,
+            schools.address,
+            schools.description,
+            schools.contact,
+            school_category.category_name,
+            districts.district_name,
+            districts.region,
+            districts.country
         FROM schools
         JOIN school_category ON schools.category_id = school_category.id
+        JOIN districts ON schools.district_id = districts.id
     ''')
     schools = cursor.fetchall()
     cursor.close()
     conn.close()
 
-    return render_template('schools/manage_schools.html',username=session['username'],role=session['role'], schools=schools)
+    return render_template(
+        'schools/manage_schools.html',
+        username=session['username'],
+        role=session['role'],
+        schools=schools
+    )
+
+
+
+
+
+
+
+
+
+
 
 @schools_bp.route('/delete_schools/<int:school_id>', methods=['GET', 'POST'])
 def delete_schools(school_id):

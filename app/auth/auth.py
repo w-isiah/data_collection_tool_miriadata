@@ -19,6 +19,14 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Login Route
+
+
+
+
+
+
+
+# Login Route
 @users_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -26,17 +34,21 @@ def login():
         password = request.form['password']
 
         try:
+            # Fetch user from the database
             with get_db_connection() as connection:
                 with connection.cursor(dictionary=True) as cursor:
                     cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
                     user = cursor.fetchone()
 
                     if user:
+                        # Direct comparison of plain-text password (Not recommended for production)
                         stored_password = user['password']
+
                         if password == stored_password:
+                            # Update session with user details
                             session.update({
                                 'loggedin': True,
-                                'id': user['id'],
+                                'user_id': user['id'],
                                 'username': user['username'],
                                 'first_name': user['first_name'],
                                 'last_name': user['last_name'],
@@ -44,7 +56,8 @@ def login():
                                 'role': user['role'],
                                 'last_activity': datetime.utcnow()
                             })
-                            session.permanent = True
+
+                            session.permanent = True  # Make the session permanent
                             flash('Login successful!', 'success')
                             return redirect(url_for('main.index'))
                         else:
@@ -59,6 +72,9 @@ def login():
 
 
 
+
+
+
 @users_bp.route('/logout')
 def logout():
     session.clear()  # Clear session data
@@ -66,6 +82,11 @@ def logout():
     return redirect(url_for('auth.login'))  # Redirect to login page
 
 # User Management Routes (Admin/Head of Department)
+
+
+
+
+
 
 @users_bp.route('/manage_users')
 def manage_users():
@@ -85,6 +106,13 @@ def manage_users():
 
     template = 'accounts/manage_users.html' if session['role'] == 'admin' else 'accounts/moderator/manage_users.html'
     return render_template(template, username=session['username'], role=session['role'], num=num, users=users)
+
+
+
+
+
+
+
 
 @users_bp.route('/api/manage_users_count', methods=['GET'])
 def get_users_count():

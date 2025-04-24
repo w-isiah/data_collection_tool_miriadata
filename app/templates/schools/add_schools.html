@@ -97,10 +97,22 @@
                       <select name="category_id" id="category_id" class="form-control select2" required>
                         <option value="" selected disabled="selected">Select a Category</option>
                         {% for category in categories %}
-                          <option value="{{ category.id }}">{{ category.category_name }}</option>
+                        <option value="{{ category.id }}">{{ category.category_name }}</option>
                         {% endfor %}
                       </select>
                     </div>
+
+                    <!-- School district -->
+                    <div class="form-group">
+                      <label for="district_id">District:</label>
+                      <select name="district_id" id="district_id" class="form-control select2" required>
+                        <option value="" selected disabled>Select a district</option>
+                        {% for d in districts %}
+                        <option value="{{ d.id }}">{{ d.district_name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+
 
                     <!-- Address -->
                     <div class="form-group">
