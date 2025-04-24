@@ -1,8 +1,8 @@
 {% extends "layouts/moderator_base.html" %}
 
-{% block title %}Add Rating{% endblock %}
+{% block title %}Add District{% endblock %}
 
-{% block body_class %}moderator_sidebar-mini{% endblock %}
+{% block body_class %}moderator_sidebar-mini{% endblock body_class %}
 
 {% block stylesheets %}
 <!-- Include necessary stylesheets for the page -->
@@ -19,13 +19,13 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0 text-dark">Add Rating</h1>
+          <h1 class="m-0 text-dark">Add District</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('ratings.manage_ratings') }}">Ratings</a></li>
-            <li class="breadcrumb-item active">Add Rating</li>
+            <li class="breadcrumb-item"><a href="{{ url_for('districts.manage_districts') }}">Districts</a></li>
+            <li class="breadcrumb-item active">Add District</li>
           </ol>
         </div>
       </div>
@@ -36,15 +36,15 @@
   <section class="content">
     <div class="container-fluid">
 
-      <!-- Add Rating Form -->
+      <!-- Add District Form -->
       <div class="row">
         <div class="col-md-12">
           <div class="card card-info">
             <div class="card-header">
-              <h3 class="card-title">Add Rating</h3>
+              <h3 class="card-title">Add District</h3>
             </div>
             <div class="card-body">
-              <!-- Display any flash messages -->
+              <!-- Display flash messages -->
               {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                   <div class="alert-container">
@@ -60,48 +60,26 @@
                 {% endif %}
               {% endwith %}
 
-              <!-- Form to Add Rating -->
-              <form method="POST" action="{{ url_for('ratings.add_rating') }}">
+              <!-- Form to Add District -->
+              <form method="POST" action="{{ url_for('districts.add_district') }}">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-
-                <!-- Rating Name Field -->
+                
                 <div class="form-group">
-                  <label for="rating_name">Rating Name</label>
-                  <input type="text" class="form-control" id="rating_name" name="rating_name" placeholder="Enter Rating Name" required>
+                  <label for="district_name">District Name</label>
+                  <input type="text" class="form-control" id="district_name" name="district_name" placeholder="Enter District Name" required>
                 </div>
 
-                <!-- Rating Description Field -->
                 <div class="form-group">
-                  <label for="rating_description">Description</label>
-                  <textarea class="form-control" id="rating_description" name="description" rows="3" placeholder="Enter Rating Description" required></textarea>
+                  <label for="region">Region</label>
+                  <input type="text" class="form-control" id="region" name="region" placeholder="Enter Region (optional)">
                 </div>
 
-                <!-- Rating Mark Field -->
                 <div class="form-group">
-                  <label for="rating_mark">Mark</label>
-                  <select class="form-control" id="rating_mark" name="mark" required>
-                    <option value="0"></option>
-                    <option value="1">Strongly Disagree</option>
-                    <option value="2">Disagree</option>
-                    <option value="3">Not Sure</option>
-                    <option value="4">Agree</option>
-                    <option value="5">Strongly Agree</option>
-                  </select>
+                  <label for="country">Country</label>
+                  <input type="text" class="form-control" id="country" name="country" placeholder="Enter Country (optional)">
                 </div>
 
-                <!-- Assessment Criteria Selection -->
-                <div class="form-group">
-                  <label for="assessment_criteria_id">Criteria Question:</label>
-                  <select class="form-control select2" name="assessment_criteria_id" id="assessment_criteria_id" style="width: 100%;" required>
-                    <option value="" selected disabled="selected">Select Question</option>
-                    {% for criteria in assessment_criteria %}
-                      <option value="{{ criteria.criteria_id }}">{{ criteria.criteria_name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary">Add Rating</button>
+                <button type="submit" class="btn btn-primary">Add District</button>
               </form>
             </div>
           </div>

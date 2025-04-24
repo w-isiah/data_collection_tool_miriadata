@@ -46,10 +46,12 @@ from app.d_f_scores.d_f_scores import d_f_scores_bp
 from app.academic_year.academic_year import academic_year_bp
 from app.study_year.study_year import study_year_bp
 from app.db_bk.db_bk import db_bk_bp
+from app.districts.districts import districts_bp
 
 
 
 # Register blueprints
+app.register_blueprint(districts_bp,url_prefix='/districts')
 app.register_blueprint(db_bk_bp,url_prefix='/db_bk')
 app.register_blueprint(study_year_bp,url_prefix='/study_year')
 app.register_blueprint(academic_year_bp,url_prefix='/academic_year')

@@ -62,7 +62,7 @@
           <a href="#" class="nav-link">
             <i class="nav-icon fas fa-user-graduate"></i>
             <p>
-              Students
+              Teachers
               <i class="right fas fa-angle-left"></i>
             </p>
           </a>
@@ -70,13 +70,13 @@
             <li class="nav-item">
               <a href="{{ url_for('student.manage_student') }}" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
-                <p>View Students</p>
+                <p>View Teachers</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ url_for('student.add_student') }}" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
-                <p>Add Student</p>
+                <p>Add a Teacher</p>
               </a>
             </li>
           </ul>
@@ -183,6 +183,31 @@
   </ul>
 </li>
 
+
+<!-- Study Years -->
+<li class="nav-item has-treeview">
+  <a href="#" class="nav-link">
+    <i class="nav-icon fas fa-calendar-check"></i>
+    <p>
+      Districts
+      <i class="right fas fa-angle-left"></i>
+    </p>
+  </a>
+  <ul class="nav nav-treeview">
+    <li class="nav-item">
+      <a href="{{ url_for('districts.manage_districts') }}" class="nav-link">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Manage Disctricts</p>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="{{ url_for('districts.add_district') }}" class="nav-link">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Add a Disctrict</p>
+      </a>
+    </li>
+  </ul>
+</li>
 
 
 
@@ -298,7 +323,7 @@
   <a href="#" class="nav-link">
     <i class="nav-icon fas fa-user-tag"></i>
     <p>
-      Assign Assessor
+      Assign Research Assistant
       <i class="right fas fa-angle-left"></i>
     </p>
   </a>
@@ -306,7 +331,7 @@
     <li class="nav-item">
       <a href="{{ url_for('assign_assessor.manage_student') }}" class="nav-link">
         <i class="far fa-circle nav-icon"></i>
-        <p>View Students</p>
+        <p>View Teachers</p>
       </a>
     </li>
   </ul>
@@ -317,7 +342,7 @@
   <a href="#" class="nav-link">
     <i class="nav-icon fas fa-user-times"></i>
     <p>
-      Un-Assign Assessor
+      Un-Assign Research Assistant
       <i class="right fas fa-angle-left"></i>
     </p>
   </a>
@@ -325,7 +350,7 @@
     <li class="nav-item">
       <a href="{{ url_for('assign_assessor.un_assign_manage_students') }}" class="nav-link">
         <i class="far fa-circle nav-icon"></i>
-        <p>View Students</p>
+        <p>View Teachers</p>
       </a>
     </li>
   </ul>
