@@ -1,0 +1,7 @@
+flask
+pip install Flask-WTF
+pip install mysql-connector-python
+pandas
+pip install Pillow
+pip3 install openpyxl
+pip install psycopg2-binary

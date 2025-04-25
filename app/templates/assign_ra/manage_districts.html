@@ -1,0 +1,169 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %}Manage Districts{% endblock %}
+
+{% block body_class %}moderator_sidebar-mini{% endblock %}
+
+{% block stylesheets %}
+<!-- Include required stylesheets -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/5.0.4/css/fixedColumns.dataTables.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+<link rel="stylesheet" href="/static/assets/css/select2.min.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <!-- Flash Messages -->
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  <strong>{{ message }}</strong>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="content-header">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Manage Districts</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item active">Districts</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <section class="content">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Districts List</h3>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="{{ url_for('assign_ra.assign_ra') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Assign Assessor Section -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="m-0">Assign a Research Assistant to Selected Districts</h5>
+                  <button type="submit" class="btn btn-success btn-sm">
+                    <i class="fas fa-user-plus"></i> Assign Research Assistant
+                  </button>
+                </div>
+
+                <!-- Assessor Dropdown -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <label for="research_assistant_id" class="mr-2">School Practice Supervisors:</label>
+                  <select name="assessor" id="research_assistant_id" class="form-control select2" required>
+                    <option value="">Select</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}" {% if request.form.get('assessor') == user.id %} selected {% endif %}>
+                      {{ user.username }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <!-- Districts Table -->
+                <table id="districts_table" class="stripe row-border order-column" style="width:100%">
+                  <thead>
+                    <tr>
+                      <th><input type="checkbox" id="select_all"> Select All</th>
+                      <th>District Name</th>
+                      <th>Region</th>
+                      <th>Country</th>
+                      <th>Created At</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for district in districts %}
+                    <tr>
+                      <td><input type="checkbox" class="district_checkbox" name="district_ids" value="{{ district.district_id }}"></td>
+                      <td>{{ district.district_name }}</td>
+                      <td>{{ district.region }}</td>
+                      <td>{{ district.country }}</td>
+                      <td>{{ district.created_at }}</td>
+                      <td>
+                        {% if district.assigned %}
+                        <span class="badge badge-success">{{ district.assessor_name }}</span>
+                        {% else %}
+                        <span class="badge badge-warning">Unassigned</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/static/assets/js/adminlte.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+  $(function () {
+    // Initialize Select2
+    $('.select2').select2({ width: '100%' });
+
+    // Initialize DataTable
+    var table = $('#districts_table').DataTable({
+      fixedColumns: { left: 3, right: 1 },
+      paging: false,
+      scrollCollapse: true,
+      scrollX: true,
+      scrollY: 300
+    });
+
+    // Checkbox select all functionality
+    $("#select_all").change(function() {
+      $(".district_checkbox").prop('checked', $(this).prop('checked'));
+    });
+
+    $(".district_checkbox").change(function() {
+      if ($(".district_checkbox:checked").length === $(".district_checkbox").length) {
+        $("#select_all").prop('checked', true);
+      } else {
+        $("#select_all").prop('checked', false);
+      }
+    });
+  });
+</script>
+{% endblock javascripts %}

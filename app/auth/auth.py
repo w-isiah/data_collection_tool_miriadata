@@ -26,38 +26,36 @@ def allowed_file(filename):
 
 
 
-# Login Route
+
 @users_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
 
         try:
-            # Fetch user from the database
             with get_db_connection() as connection:
                 with connection.cursor(dictionary=True) as cursor:
                     cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
                     user = cursor.fetchone()
 
                     if user:
-                        # Direct comparison of plain-text password (Not recommended for production)
-                        stored_password = user['password']
-
-                        if password == stored_password:
-                            # Update session with user details
+                        # 👇 Plain-text password check (for dev only — replace with secure hash in prod)
+                        if password == user['password']:
+                            # ✅ Set session
+                            session.permanent = True  # Make session last beyond the request
                             session.update({
                                 'loggedin': True,
-                                'user_id': user['id'],
+                                'user_id': user['id'],   # Set user_id in the session
                                 'username': user['username'],
                                 'first_name': user['first_name'],
                                 'last_name': user['last_name'],
                                 'profile_image': user['profile_image'],
                                 'role': user['role'],
-                                'last_activity': datetime.utcnow()
+                                'last_activity': datetime.utcnow().isoformat(),
+                                'id': user['id']  # Ensure the 'id' field is also set in the session
                             })
 
-                            session.permanent = True  # Make the session permanent
                             flash('Login successful!', 'success')
                             return redirect(url_for('main.index'))
                         else:
@@ -68,6 +66,7 @@ def login():
             flash(f'An error occurred: {e}', 'danger')
 
     return render_template('accounts/login.html')
+
 
 
 
