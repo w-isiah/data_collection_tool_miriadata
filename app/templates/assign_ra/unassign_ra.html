@@ -1,0 +1,109 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %}Manage Districts{% endblock %}
+
+{% block body_class %}moderator_sidebar-mini{% endblock %}
+
+{% block stylesheets %}
+<!-- Include required stylesheets -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/5.0.4/css/fixedColumns.dataTables.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+<link rel="stylesheet" href="/static/assets/css/mine.css">
+<link rel="stylesheet" href="/static/assets/css/select2.min.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>Unassign Research Assistants</h1>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('assign_ra.un_assign_manage_ra') }}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        
+        <button class="btn btn-danger mb-3" type="submit">Unassign Selected</button>
+
+        <table id="districts_table" class="display nowrap" style="width:100%">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="select_all"></th>
+              <th>District Name</th>
+              <th>Region</th>
+              <th>Country</th>
+              <th>Created At</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in districts %}
+              <tr>
+                <td>
+                  {% if d.assigned %}
+                    <input type="checkbox" class="district_checkbox" name="district_ids" value="{{ d.district_id }}">
+                  {% endif %}
+                </td>
+                <td>{{ d.district_name }}</td>
+                <td>{{ d.region }}</td>
+                <td>{{ d.country }}</td>
+                <td>{{ d.created_at }}</td>
+                <td>
+                  {% if d.assigned %}
+                    <span class="badge badge-success">{{ d.assessor_name }}</span>
+                  {% else %}
+                    <span class="badge badge-secondary">Unassigned</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+
+
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/static/assets/js/adminlte.js"></script>
+<script src="/static/assets/js/mine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#districts_table').DataTable({ scrollX: true });
+
+    $('#select_all').on('click', function () {
+      $('.district_checkbox').prop('checked', $(this).prop('checked'));
+    });
+
+    $('.district_checkbox').on('change', function () {
+      $('#select_all').prop('checked', $('.district_checkbox:checked').length === $('.district_checkbox').length);
+    });
+  });
+</script>
+{% endblock %}

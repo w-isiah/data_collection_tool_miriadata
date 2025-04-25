@@ -97,7 +97,7 @@
                   <path d="M10 3H3c-1.104 0-1.99.886-1.99 1.99V19.01C1.01 20.115 1.886 21 3 21h18c1.104 0 1.99-.885 1.99-1.99V4.99C21.99 3.885 21.114 3 20 3h-7V0l-4 4h-4c-1.104 0-1.99.886-1.99 1.99V19.01C1.01 20.115 1.886 21 3 21h18c1.104 0 1.99-.885 1.99-1.99V4.99C21.99 3.885 21.114 3 20 3h-7V0l-4 4h-4z"/>
                 </svg>
               </div>
-              <a href="{{ url_for('student.manage_student') }}" class="small-box-footer">
+              <a href="{{ url_for('demo_data.manage_demo_data') }}" class="small-box-footer">
                 More info <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
@@ -125,38 +125,21 @@
           <div class="col-lg-3 col-6">
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>Assessment</h3>
-                <p>Status Reports</p>
+                <h3>Assessments</h3>
+                <p>Survey Collected Data</p>
               </div>
               <div class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="color: #32CD32;">
                   <path d="M12 2v4M12 18v4M12 6l4 4-4 4M12 6l-4 4 4 4"/>
                 </svg>
               </div>
-              <a href="{{ url_for('assessment.assessment_report') }}" class="small-box-footer">
+              <a href="#" class="small-box-footer">
                 More info <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
           </div>
 
-          <!-- Assess a Student Box -->
-          <div class="col-lg-3 col-6">
-            <div class="small-box bg-primary">
-              <div class="inner">
-                <h3>Assess</h3>
-                <p>Assessments</p>
-              </div>
-              <div class="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="color: #FF4500;">
-                  <path d="M12 2v20M2 12h20" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <a href="{{ url_for('assessment.check_student') }}" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-
+         
        
 
         </div>

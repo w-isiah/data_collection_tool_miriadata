@@ -24,7 +24,7 @@ def manage_demo_data():
                 cursor.execute("""
                     SELECT demo_data.*, users.username
                     FROM demo_data
-                    LEFT JOIN users ON demo_data.user_id = users.id
+                    LEFT JOIN users ON demo_data.user_id = users.id ORDER BY created_at 
                 """)
                 demo_data = cursor.fetchall()
 
