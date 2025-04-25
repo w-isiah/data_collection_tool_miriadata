@@ -92,30 +92,7 @@
 
 
 
-<!-- Study Years -->
-<li class="nav-item has-treeview">
-  <a href="#" class="nav-link">
-    <i class="nav-icon fas fa-calendar-check"></i>
-    <p>
-      Districts
-      <i class="right fas fa-angle-left"></i>
-    </p>
-  </a>
-  <ul class="nav nav-treeview">
-    <li class="nav-item">
-      <a href="{{ url_for('districts.manage_districts') }}" class="nav-link">
-        <i class="far fa-circle nav-icon"></i>
-        <p>Manage Disctricts</p>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('districts.add_district') }}" class="nav-link">
-        <i class="far fa-circle nav-icon"></i>
-        <p>Add a Disctrict</p>
-      </a>
-    </li>
-  </ul>
-</li>
+
 
 
 
@@ -126,80 +103,29 @@
 <!-- Miscellaneous Section -->
 <li class="nav-header">TEACHER OBSERVATION TOOL</li>
 
-<!-- Assessment Section -->
-<li class="nav-item has-treeview">
-  <a href="#" class="nav-link">
-    <i class="nav-icon fas fa-pencil-alt"></i>
-    <p>
-      Assessment
-      <i class="right fas fa-angle-left"></i>
-    </p>
-  </a>
-  <ul class="nav nav-treeview">
-    <li class="nav-item">
-      <a href="{{ url_for('assessment.assessment_report') }}" class="nav-link">
-        <i class="far fa-circle nav-icon"></i>
-        <p>View Report</p>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('assessment.check_student') }}" class="nav-link">
-        <i class="far fa-circle nav-icon"></i>
-        <p>Assess A Student</p>
-      </a>
-    </li>
-  </ul>
-</li>
+
 
 <!-- Results Section -->
 <li class="nav-item has-treeview">
   <a href="#" class="nav-link">
     <i class="nav-icon fas fa-chart-line"></i>
     <p>
-      Results
+      Reports
       <i class="right fas fa-angle-left"></i>
     </p>
   </a>
   <ul class="nav nav-treeview">
     <li class="nav-item">
-      <a href="{{ url_for('student.moderator_manage_assess_students') }}" class="nav-link">
+      <a href="#" class="nav-link">
         <i class="far fa-circle nav-icon"></i>
-        <p>View Results</p>
+        <p>View Reports</p>
       </a>
     </li>
-    <li class="nav-item">
-      <a href="{{ url_for('assessment.check_student') }}" class="nav-link">
-        <i class="far fa-circle nav-icon"></i>
-        <p>Assess A Student</p>
-      </a>
-    </li>
+  
   </ul>
 </li>
 
-<!-- Manual Assessment Section -->
-<li class="nav-item has-treeview">
-  <a href="#" class="nav-link">
-    <i class="nav-icon fas fa-pencil-alt"></i>
-    <p>
-      Manual Assessment
-      <i class="right fas fa-angle-left"></i>
-    </p>
-  </a>
-  <ul class="nav nav-treeview">
-    <li class="nav-item">
-      <a href="{{ url_for('moderate.manage_students') }}" class="nav-link">
-        <i class="far fa-circle nav-icon"></i>
-        <p>View Students</p>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('moderate.check_student') }}" class="nav-link">
-        <i class="far fa-circle nav-icon"></i>
-        <p>Assess A Student</p>
-      </a>
-    </li>
-  </ul>
-</li>
+
 
 <!-- Aspect Questions Section -->
 <li class="nav-item has-treeview">
@@ -239,7 +165,7 @@
     <li class="nav-item">
       <a href="{{ url_for('assign_ra.manage_districts') }}" class="nav-link">
         <i class="far fa-circle nav-icon"></i>
-        <p>View Assistants</p>
+        <p>View</p>
       </a>
     </li>
   </ul>
@@ -256,9 +182,9 @@
   </a>
   <ul class="nav nav-treeview">
     <li class="nav-item">
-      <a href="{{ url_for('assign_assessor.un_assign_manage_students') }}" class="nav-link">
+      <a href="{{ url_for('assign_ra.un_assign_manage_ra') }}" class="nav-link">
         <i class="far fa-circle nav-icon"></i>
-        <p>View Teachers</p>
+        <p>View</p>
       </a>
     </li>
   </ul>
@@ -298,6 +224,36 @@
         </li>
       </ul>
     </li>
+
+
+
+
+<!-- Districts-->
+<li class="nav-item has-treeview">
+  <a href="#" class="nav-link">
+    <i class="nav-icon fas fa-calendar-check"></i>
+    <p>
+      Districts
+      <i class="right fas fa-angle-left"></i>
+    </p>
+  </a>
+  <ul class="nav nav-treeview">
+    <li class="nav-item">
+      <a href="{{ url_for('districts.manage_districts') }}" class="nav-link">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Manage Disctricts</p>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="{{ url_for('districts.add_district') }}" class="nav-link">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Add a Disctrict</p>
+      </a>
+    </li>
+  </ul>
+</li>
+
+
 
     <!-- Schools -->
     <li class="nav-item has-treeview">

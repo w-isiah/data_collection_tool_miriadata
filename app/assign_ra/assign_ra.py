@@ -184,79 +184,56 @@ def assign_ra():
 
 
 
-@assign_ra_bp.route('/un_assign_manage_students', methods=['GET', 'POST'])
-def un_assign_manage_students():
+@assign_ra_bp.route('/un_assign_manage_ra', methods=['GET', 'POST'])
+def un_assign_manage_ra():
+    if 'username' not in session or 'role' not in session:
+        flash("You must be logged in to manage districts.", 'warning')
+        return redirect(url_for('auth.login'))
+
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        programmes, terms = fetch_programmes_and_terms()
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
 
-        assessors_query = "SELECT id, username FROM users WHERE role != 'admin' AND role != 'Head of Department'"
-        cursor.execute(assessors_query)
-        assessors = cursor.fetchall()
+            if request.method == 'POST':
+                # Handle unassignment
+                selected_ids = request.form.getlist('district_ids')
+                if selected_ids:
+                    delete_query = "DELETE FROM assign_research_assistant WHERE district_id = %s"
+                    for district_id in selected_ids:
+                        cursor.execute(delete_query, (district_id,))
+                    conn.commit()
+                    flash("Selected districts have been unassigned.", "success")
+                else:
+                    flash("No districts selected for unassignment.", "warning")
 
-        query = """
-            SELECT
-                si.id AS student_id,
-                si.student_teacher,
-                si.reg_no,
-                si.subject,
-                si.class_name,
-                si.topic,
-                si.subtopic,
-                si.teaching_time,
-                p.programme_name,
-                p.description AS programme_description,
-                t.term AS term,
-                t.id AS term_id,
-                a.assessor_id IS NOT NULL AS assigned,
-                u.username AS assessor_name,
-                u.id AS assessor_id,
-                a.id AS assign_id
-            FROM student_info si
-            LEFT JOIN programmes p ON si.programme_id = p.id
-            LEFT JOIN terms t ON si.term_id = t.id
-            LEFT JOIN assign_ra a ON si.id = a.student_id AND si.term_id = a.term_id
-            LEFT JOIN users u ON a.assessor_id = u.id
-            WHERE a.assessor_id IS NOT NULL  -- This condition ensures that only students with an assessor assigned are included
-        """
+            # Fetch assessors
+            cursor.execute("""
+                SELECT id, username FROM users 
+                WHERE role NOT IN ('admin', 'Head of Department')
+            """)
+            assessors = cursor.fetchall()
 
-        params = []
-        student_info = []
-
-        if request.method == 'POST':
-            conditions = []
-
-            if programme := request.form.get('programme'):
-                conditions.append("si.programme_id = %s")
-                params.append(programme)
-
-            if term := request.form.get('term'):
-                conditions.append("si.term_id = %s")
-                params.append(term)
-
-            if reg_no := request.form.get('reg_no'):
-                conditions.append("si.reg_no LIKE %s")
-                params.append(f"%{reg_no}%")
-
-            if conditions:
-                query += " AND " + " AND ".join(conditions)  # Adjusted query with additional conditions
-                cursor.execute(query, params)
-                student_info = cursor.fetchall()
-        else:
-            cursor.execute(query, params)
-            student_info = cursor.fetchall()
-
-        cursor.close()
-        conn.close()
+            # Fetch district info
+            cursor.execute("""
+                SELECT 
+                    d.id AS district_id,
+                    d.district_name,  
+                    d.region, 
+                    d.country, 
+                    d.created_at,
+                    CASE WHEN a.research_assistant_id IS NOT NULL THEN TRUE ELSE FALSE END AS assigned,
+                    u.username AS assessor_name
+                FROM districts d
+                LEFT JOIN assign_research_assistant a ON d.id = a.district_id
+                LEFT JOIN users u ON a.research_assistant_id = u.id
+            """)
+            districts = cursor.fetchall()
 
         return render_template('assign_ra/unassign_ra.html',
                                username=session['username'],
                                role=session['role'],
-                               students=student_info,  # Corrected variable name
-                               programmes=programmes,
-                               terms=terms,
-                               assessors=assessors)
+                               assessors=assessors,
+                               districts=districts)
 
     except Exception as e:
         print(f"Error occurred: {str(e)}")
@@ -270,49 +247,42 @@ def un_assign_manage_students():
 
 
 
-
-
-
-
-
-
 @assign_ra_bp.route('/unassign_ra', methods=['POST'])
 def unassign_ra():
-    if request.method == 'POST':
-        district_ids = request.form.getlist('district_ids')  # List of selected district IDs to unassign
+    if 'username' not in session or 'role' not in session:
+        flash("You must be logged in to perform this action.", 'warning')
+        return redirect(url_for('auth.login'))
 
-        connection = get_db_connection()
-        cursor = connection.cursor()
+    district_ids = request.form.getlist('district_ids')
 
-        try:
-            # Loop through the selected district_ids and delete assignments
-            for district_id in district_ids:
-                delete_query = """
+    if not district_ids:
+        flash("No districts selected for unassignment.", 'warning')
+        return redirect(url_for('assign_ra.un_assign_manage_ra'))
+
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+
+            delete_query = """
                 DELETE FROM assign_research_assistant 
                 WHERE district_id = %s
-                """
+            """
+
+            for district_id in district_ids:
                 cursor.execute(delete_query, (district_id,))
-                flash(f"Research Assistant unassigned from District ID {district_id}", "success")
+                flash(f"Unassigned RA from District ID {district_id}", "success")
 
-            connection.commit()
+            conn.commit()
 
-        except mysql.connector.Error as err:
-            logging.error(f"MySQL error: {err}")
-            connection.rollback()
-            flash(f"MySQL error while unassigning: {str(err)}", 'danger')
+    except mysql.connector.Error as err:
+        logging.error(f"MySQL error: {err}")
+        flash(f"MySQL error while unassigning: {str(err)}", 'danger')
 
-        except Exception as e:
-            logging.error(f"Unexpected error: {e}")
-            connection.rollback()
-            flash(f"Error occurred while unassigning: {str(e)}", 'danger')
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
+        flash(f"An error occurred while unassigning: {str(e)}", 'danger')
 
-        finally:
-            cursor.close()
-            connection.close()
-
-        return redirect(url_for('assign_ra.manage_assigned_districts'))  # Replace with your actual view name
-
-
+    return redirect(url_for('assign_ra.un_assign_manage_ra'))
 
 
 
