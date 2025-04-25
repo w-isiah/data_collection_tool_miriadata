@@ -49,7 +49,11 @@ def manage_districts():
             # Fetch assessors (School Practice Supervisors)
             assessors_query = """
             SELECT id, username FROM users 
+<<<<<<< HEAD
             WHERE role != 'admin'
+=======
+            WHERE role != 'admin' AND role != 'Head of Department'
+>>>>>>> ce3e2d0512ec62c7afb96b24577ffb7bd2e33569
             """
             cursor.execute(assessors_query)
             assessors = cursor.fetchall()
@@ -290,6 +294,12 @@ def unassign_ra():
 
 
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> ce3e2d0512ec62c7afb96b24577ffb7bd2e33569
 @assign_ra_bp.route('/m_manage_students', methods=['GET', 'POST'])
 def m_manage_student():
     try:

@@ -31,8 +31,13 @@ from app.aspects.aspects import aspects_bp
 from app.aspect_questions.aspect_questions import aspect_qns_bp
 from app.assessment.assessment import assessment_bp
 from app.scores.scores import scores_bp
+<<<<<<< HEAD
 
 
+=======
+from app.programmes.programmes import programmes_bp
+from app.terms.terms import term_bp
+>>>>>>> ce3e2d0512ec62c7afb96b24577ffb7bd2e33569
 from app.school_category.school_category import school_category_bp
 from app.schools.schools import schools_bp
 from app.moderate.moderate import moderate_bp
@@ -46,18 +51,36 @@ from app.assign_ra.assign_ra import assign_ra_bp
 app.register_blueprint(assign_ra_bp, url_prefix='/assign_ra')
 app.register_blueprint(demo_data_bp, url_prefix='/demo_data')
 app.register_blueprint(districts_bp, url_prefix='/districts')
+<<<<<<< HEAD
 
 
 
 app.register_blueprint(modulate_bp, url_prefix='/modulate')
 
 
+=======
+app.register_blueprint(db_bk_bp, url_prefix='/db_bk')
+app.register_blueprint(study_year_bp, url_prefix='/study_year')
+app.register_blueprint(academic_year_bp, url_prefix='/academic_year')
+app.register_blueprint(d_f_scores_bp, url_prefix='/d_f_scores')
+app.register_blueprint(d_f_assessment_bp, url_prefix='/d_f_assessment')
+app.register_blueprint(d_f_students_bp, url_prefix='/d_f_students')
+app.register_blueprint(d_f_assign_assessor_bp, url_prefix='/d_f_assign_assessor')
+app.register_blueprint(modulate_bp, url_prefix='/modulate')
+app.register_blueprint(results_upload_bp, url_prefix='/results_upload')
+app.register_blueprint(assign_assessor_bp, url_prefix='/assign_assessor')
+>>>>>>> ce3e2d0512ec62c7afb96b24577ffb7bd2e33569
 app.register_blueprint(ratings_bp, url_prefix='/ratings')
 app.register_blueprint(moderate_bp, url_prefix='/moderate')
 app.register_blueprint(schools_bp, url_prefix='/schools')
 app.register_blueprint(school_category_bp, url_prefix='/school_category')
+<<<<<<< HEAD
 
 
+=======
+app.register_blueprint(term_bp, url_prefix='/terms')
+app.register_blueprint(programmes_bp, url_prefix='/programmes')
+>>>>>>> ce3e2d0512ec62c7afb96b24577ffb7bd2e33569
 app.register_blueprint(scores_bp, url_prefix='/scores')
 app.register_blueprint(assessment_bp, url_prefix='/assessment')
 app.register_blueprint(aspect_qns_bp, url_prefix='/aspect_qns')
