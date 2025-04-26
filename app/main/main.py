@@ -29,7 +29,7 @@ def index():
         # Check the role and render appropriate template
         if session['role'] == "admin":
             return render_template('admin/index.html', username=session['username'], role=session['role'], user_count=num)
-        elif session['role'] == "Head of Department":
+        elif session['role'] == "Principal_Investigator":
             return render_template('moderator/index.html', username=session['username'], role=session['role'], user_count=num)
         else:
             return render_template('assessor/index.html', username=session['username'], role=session['role'], user_count=num)

@@ -57,7 +57,7 @@ def assess(demo_data_id):
         connection.close()
 
     # Render the template with the fetched data
-    if session['role'] == 'Head of Department':
+    if session['role'] == 'Principal_Investigator':
         return render_template('assessment/add_assessment.html',
                                ratings_by_criteria=ratings_by_criteria, 
                                schools=schools,

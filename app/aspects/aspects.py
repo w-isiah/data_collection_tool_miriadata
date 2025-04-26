@@ -20,7 +20,7 @@ def manage_aspects():
     cursor.close()
     conn.close()
 
-    if session['role'] == "Head of Department":
+    if session['role'] == "Principal_Investigator":
         return render_template('aspects/moderator_manage_aspect.html',username=session['username'],role=session['role'], aspects=aspects)
     else:
         return render_template('aspects/manage_aspect.html',username=session['username'],role=session['role'], aspects=aspects)

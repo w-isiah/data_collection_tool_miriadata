@@ -19,7 +19,7 @@ def manage_districts():
     conn.close()
 
     role=session.get("role")
-    if role == "School Practice Supervisor":
+    if role == "Research_Assistant":
         return render_template('districts/assessor_manage_district.html', username=session['username'], role=session['role'],districts=districts)
     else:
         return render_template('districts/manage_districts.html', username=session['username'], role=session['role'],districts=districts)
@@ -73,7 +73,7 @@ def edit_district(district_id):
 
     conn.close()
     role=session.get("role")
-    if role == "School Practice Supervisor":
+    if role == "Research_Assistant":
         return render_template('districts/assessor_edit_district.html',
                                username=session['username'],
                                role=session['role'],
@@ -138,7 +138,7 @@ def add_district():
 
     # GET request — render the form
     role=session.get("role")
-    if role == "School Practice Supervisor":
+    if role == "Research_Assistant":
         return render_template('districts/assessor_add_district.html',
                                username=session['username'],
                                role=session['role'])

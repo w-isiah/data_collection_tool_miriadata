@@ -50,7 +50,7 @@ def manage_demo_data():
                         full_name = f"{user_info['first_name']} {user_info['last_name']}"
 
         # Render the page
-        if role0 == "Head of Department":
+        if role0 == "Principal_Investigator":
             return render_template(
                 'demo_data/manage_demo_data.html',
                 username=username,
@@ -127,7 +127,7 @@ def edit_demo_data(demo_data_id):
         return redirect(url_for('demo_data.manage_demo_data'))
 
     conn.close()
-    if role0 == "Head of Department":
+    if role0 == "Principal_Investigator":
         return render_template('demo_data/edit_demo_data.html',
                                username=session.get('username'),
                                role=session.get('role'),
@@ -203,7 +203,7 @@ def add_demo_data():
             return redirect(url_for('demo_data.add_demo_data'))
 
     # GET request (render form)
-    if role0 == "Head of Department":
+    if role0 == "Principal_Investigator":
         return render_template('demo_data/add_demo_data.html',
                                username=session.get('username'),
                                role=session.get('role'))

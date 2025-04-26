@@ -80,7 +80,7 @@ def logout():
     flash('You have logged out successfully.', 'success')
     return redirect(url_for('auth.login'))  # Redirect to login page
 
-# User Management Routes (Admin/Head of Department)
+# User Management Routes (Admin/Principal_Investigator)
 
 
 
@@ -94,8 +94,8 @@ def manage_users():
             with connection.cursor(dictionary=True) as cursor:
                 if session['role'] == 'admin':
                     cursor.execute("SELECT * FROM users WHERE role != 'admin'")
-                elif session['role'] == 'Head of Department':
-                    cursor.execute("SELECT * FROM users WHERE role NOT IN ('admin', 'Head of Department', 'Dean')")
+                elif session['role'] == 'Principal_Investigator':
+                    cursor.execute("SELECT * FROM users WHERE role NOT IN ('admin', 'Principal_Investigator', 'Dean')")
                 users = cursor.fetchall()
 
                 num = len(users)
@@ -347,7 +347,7 @@ def edit_user_profile(id):
     # Render the appropriate template based on the role
     role = session.get('role')
     username = session.get('username')
-    if role == "Head of Department":
+    if role == "Principal_Investigator":
         return render_template('accounts/h_edit_user_profile.html', role=role, username=username, user=user)
     elif role == "School Practice Supervisor":
         return render_template('accounts/a_edit_user_profile.html', role=role, username=username, user=user)

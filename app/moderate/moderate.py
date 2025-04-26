@@ -71,7 +71,7 @@ def manage_students():
         print("Student Info for Rendering:", student_info)
 
         # Selecting the correct template based on user role
-        template = 'student/manage_student.html' if session.get('role') == "Head of Department" else 'student/assessor_manage_student.html'
+        template = 'student/manage_student.html' if session.get('role') == "Principal_Investigator" else 'student/assessor_manage_student.html'
         return render_template(template, username=session.get('username'), role=session.get('role'),
                                student_info=student_info, programmes=programmes, terms=terms)
     
@@ -187,7 +187,7 @@ def check_student():
             student = cursor.fetchone()
 
             if not student:
-                if role == "Head of Department":
+                if role == "Principal_Investigator":
                     return render_template('moderate/check_student_2.html', role=role, message="No student found with the given registration number.")
                 else:
                     return render_template('moderate/assessor/check_student_2.html', role=role, message="No student found with the given registration number.")
@@ -206,7 +206,7 @@ def check_student():
 
             # If no marks are found, mark the student as "Not Assessed"
             if not student_marks:
-                if role == "Head of Department":
+                if role == "Principal_Investigator":
                     return render_template('moderate/check_student_2.html', username=session['username'], role=role, student=student, message="Student has not been assessed yet. Please assess them.")
                 else:
                     return render_template('moderate/assessor/check_student_2.html', username=session['username'], role=role, student=student, message="Student has not been assessed yet. Please assess them.")
@@ -234,13 +234,13 @@ def check_student():
                 results.append(result)
 
             # Return the template with results
-            if role == "Head of Department":
+            if role == "Principal_Investigator":
                 return render_template('moderate/check_student_2.html', username=session['username'], role=role, student=student, results=results)
             else:
                 return render_template('moderate/assessor/check_student_2.html', username=session['username'], role=role, student=student, results=results)
 
         # Handle GET requests (show the initial form)
-        if role == "Head of Department":
+        if role == "Principal_Investigator":
             return render_template('moderate/check_student_2.html', username=session['username'], role=role)
         else:
             return render_template('moderate/assessor/check_student_2.html', username=session['username'], role=role)
@@ -248,7 +248,7 @@ def check_student():
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         flash("An error occurred while processing the request.", "danger")
-        if role == "Head of Department":
+        if role == "Principal_Investigator":
             return render_template('moderate/check_student_2.html', username=session['username'], role=role)
         else:
             return render_template('moderate/assessor/check_student_2.html', username=session['username'], role=role)
@@ -291,7 +291,7 @@ def assess_v1(student_id):
         conn.close()  # Close the database connection
 
     # Based on user role, render appropriate template
-    if role == 'Head of Department':
+    if role == 'Principal_Investigator':
         return render_template(
             'moderate/add_assessment.html', 
             schools=schools,
@@ -300,7 +300,7 @@ def assess_v1(student_id):
             student_id=student_id, 
             student=student
         )
-    elif role == 'School Practice Supervisor':
+    elif role == 'Research_Assistant':
         return render_template(
             'assessment_v1/assessor/add_assessment.html', 
             schools=schools, 
@@ -366,9 +366,9 @@ def save_scores():
         flash("Marks saved successfully!", "success")
 
         # Render a summary page with the saved data based on the role
-        if role0 == "Head of Department":
+        if role0 == "Principal_Investigator":
             return render_template("moderate/evaluation_summary.html", username=session['username'], role=session['role'], student_id=student_id, term_id=term_id)
-        elif role0 == "School Practice Supervisor":
+        elif role0 == "Research_Assistant":
             return render_template("scores/assessor/evaluation_summary.html", username=session['username'], role=session['role'], student_id=student_id, term_id=term_id)
         else:
             flash("Unauthorized role. Cannot view the summary.", "danger")
