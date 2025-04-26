@@ -25,7 +25,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 from app.modulate.modulate import modulate_bp
 from app.auth.auth import users_bp
 from app.main.main import main_bp
-from app.students.students import student_bp
+
 from app.aspects.aspects import aspects_bp
 from app.aspect_questions.aspect_questions import aspect_qns_bp
 from app.assessment.assessment import assessment_bp
@@ -59,6 +59,6 @@ app.register_blueprint(scores_bp, url_prefix='/scores')
 app.register_blueprint(assessment_bp, url_prefix='/assessment')
 app.register_blueprint(aspect_qns_bp, url_prefix='/aspect_qns')
 app.register_blueprint(aspects_bp, url_prefix='/aspects')
-app.register_blueprint(student_bp, url_prefix='/student')
+
 app.register_blueprint(users_bp, url_prefix='/users')
 app.register_blueprint(main_bp, url_prefix='/')
