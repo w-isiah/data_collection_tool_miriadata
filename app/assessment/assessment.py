@@ -14,8 +14,8 @@ assessment_bp = Blueprint('assessment', __name__)
 
 
 
-@assessment_bp.route('/assess/<int:student_id>', methods=['GET', 'POST'])
-def assess(student_id):
+@assessment_bp.route('/assess/<int:demo_data_id>', methods=['GET', 'POST'])
+def assess(demo_data_id):
     role0 = session.get('role')
     
     # Establish a database connection
@@ -23,9 +23,9 @@ def assess(student_id):
     cursor = connection.cursor(dictionary=True)
 
     try:
-        # Fetch student data
-        cursor.execute("SELECT * FROM student_info WHERE id = %s", (student_id,))
-        student = cursor.fetchone()
+        # Fetch demo_data data
+        cursor.execute("SELECT * FROM demo_data WHERE id = %s", (demo_data_id,))
+        demo_data = cursor.fetchone()
 
         cursor.execute("SELECT * FROM schools")
         schools = cursor.fetchall()
@@ -33,9 +33,9 @@ def assess(student_id):
         cursor.execute("SELECT * FROM ratings")
         ratings = cursor.fetchall()
 
-        # Check if the student exists
-        if not student:
-            return "Student not found", 404  # Return a 404 error if the student does not exist
+        # Check if the demo_data exists
+        if not demo_data:
+            return "respondent not found", 404  # Return a 404 error if the demo_data does not exist
 
         # Fetch assessment criteria data with aspect_id included
         cursor.execute("""
@@ -63,18 +63,18 @@ def assess(student_id):
                                schools=schools,
                                username=session['username'], 
                                role=session['role'], 
-                               student_id=student_id, 
+                               demo_data_id=demo_data_id, 
                                data=data, 
-                               student=student)
+                               demo_data=demo_data)
     else:
         return render_template('assessment/assessor/add_assessment.html',
                                ratings_by_criteria=ratings_by_criteria, 
                                schools=schools,
                                username=session['username'], 
                                role=session['role'],
-                               student_id=student_id, 
+                               demo_data_id=demo_data_id, 
                                data=data, 
-                               student=student)
+                               demo_data=demo_data)
 
 
 

@@ -31,18 +31,15 @@ def save_scores():
 
     try:
         assessor_id = session["id"]
-        student_id = request.form.get("student_teacher_id")
-        term_id = request.form.get("term_id")
+        demo_data_id = request.form.get("demo_data_id")
         school_id = request.form.get("school_id")
-
-        print(f"Received data: student_id={student_id}, term_id={term_id}, school_id={school_id}")
 
         aspect_ids = request.form.getlist("aspect_id[]")
         scores = request.form.getlist("score[]")
         criteria_ids = request.form.getlist("criteria_id[]")
-        comment = request.form.get("comment")  # Get the comment text from the form
+        comment = request.form.get("comment")
 
-        if not all([student_id, term_id, aspect_ids, scores, criteria_ids, school_id, comment]):
+        if not all([demo_data_id, aspect_ids, scores, criteria_ids, school_id, comment]):
             flash("Missing required fields. Please check your input.", "danger")
             return redirect(url_for("main.index"))
 
@@ -53,60 +50,51 @@ def save_scores():
         try:
             scores_float = [float(score) for score in scores]
             total_score = sum(scores_float)
-            print(f"Total score: {total_score}")
         except ValueError as e:
             flash(f"Error converting scores: {str(e)}", "danger")
             return redirect(url_for("main.index"))
 
         max_score = 5 * len(criteria_ids)
-        print(f"Max score: {max_score}")
-
         if max_score > 0:
             total_percentage = (total_score / max_score) * 100
             total_percentage = round(min(total_percentage, 100), 0)
 
-            # Generate a random SKU
-            marks_scores_sku = str(random.randint(1000000000, 9999999999))  # Generate a 10-digit random number
+            marks_scores_sku = str(random.randint(1000000000, 9999999999))
 
-            # Insert into `marks` table with `marks_scores_sku`
+            # Insert into marks
             cursor.execute("""
-                INSERT INTO marks (student_id, assessor_id, term_id, school_id, marks, assessment_type, date_awarded, marks_scores_sku)
-                VALUES (%s, %s, %s, %s, %s, %s, CURDATE(), %s)
+                INSERT INTO marks (demo_data_id, assessor_id, school_id, marks, assessment_type, date_awarded, marks_scores_sku)
+                VALUES (%s, %s, %s, %s, %s, CURDATE(), %s)
                 ON DUPLICATE KEY UPDATE marks = %s, date_awarded = CURDATE(), marks_scores_sku = %s
-            """, (student_id, assessor_id, term_id, school_id, total_percentage, "system", marks_scores_sku, total_percentage, marks_scores_sku))
-
+            """, (demo_data_id, assessor_id, school_id, total_percentage, "system", marks_scores_sku, total_percentage, marks_scores_sku))
             conn.commit()
-            print(f"Inserted into marks: student_id={student_id}, assessor_id={assessor_id}, total_percentage={total_percentage}, marks_scores_sku={marks_scores_sku}")
+
         else:
             flash("Invalid max score calculated. No data inserted into marks.", "danger")
             return redirect(url_for("main.index"))
 
-        # Insert the comment into the general_comments table
+        # Insert general comment
         cursor.execute("""
-            INSERT INTO general_comments (student_id, assessor_id, term_id, comment,marks_scores_sku)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (student_id, assessor_id, term_id, comment,marks_scores_sku))
-
+            INSERT INTO general_comments (demo_data_id, assessor_id, comment, marks_scores_sku)
+            VALUES (%s, %s, %s, %s)
+        """, (demo_data_id, assessor_id, comment, marks_scores_sku))
         conn.commit()
-        print(f"Inserted into general_comments: student_id={student_id}, assessor_id={assessor_id}, comment={comment}")
 
+        # Insert detailed scores
         data_to_insert_scores = []
         for idx, criteria_id in enumerate(criteria_ids):
             score = scores_float[idx]
             aspect_id = aspect_ids[idx]
 
             data_to_insert_scores.append(
-                (student_id, aspect_id, criteria_id, assessor_id, term_id, school_id, score, marks_scores_sku)
+                (school_id, demo_data_id, aspect_id, criteria_id, assessor_id, score, marks_scores_sku)
             )
 
-        # Insert into `scores` table with `marks_scores_sku`
         cursor.executemany("""
-            INSERT INTO scores (student_id, aspect_id, criteria_id, assessor_id, term_id, school_id, score, marks_scores_sku)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO scores (school_id, demo_data_id, aspect_id, criteria_id, assessor_id, score, marks_scores_sku)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """, data_to_insert_scores)
         conn.commit()
-
-        print("Inserted into scores table successfully.")
 
         flash("Scores and comments saved successfully!", "success")
         return redirect(url_for("student.manage_assess_students"))

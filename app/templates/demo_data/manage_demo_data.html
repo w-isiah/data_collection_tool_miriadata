@@ -1,7 +1,6 @@
 {% extends "layouts/moderator_base.html" %}
 
 {% block title %}Manage Respondents{% endblock %}
-
 {% block body_class %}moderator_sidebar-mini{% endblock %}
 
 {% block stylesheets %}
@@ -38,7 +37,7 @@
     </div>
   </div>
 
-  <!-- Header -->
+  <!-- Page Header -->
   <div class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
@@ -57,7 +56,6 @@
 
   <!-- Main Section -->
   <section class="content">
-    <!-- Add Button -->
     <div class="row mb-3">
       <div class="col-12">
         <a href="{{ url_for('demo_data.add_demo_data') }}" class="btn btn-primary">
@@ -66,7 +64,6 @@
       </div>
     </div>
 
-    <!-- Table -->
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -82,21 +79,34 @@
                   <th>Age Group</th>
                   <th>Employment Status</th>
                   <th>Years at School</th>
-                  <th>Created By</th> <!-- New column -->
+                  <th>Created By</th>
+                  <th>Assessment Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {% for respondent in demo_data %}
                   <tr>
-                    <td>{{ respondent.id_number }}</td>
+                    <td>{{ respondent.id }}</td>
                     <td>{{ respondent.sex }}</td>
                     <td>{{ respondent.age_group }}</td>
                     <td>{{ respondent.employment_status }}</td>
                     <td>{{ respondent.years_at_school }}</td>
-                    <td>{{ respondent.username or 'N/A' }}</td> <!-- Display username from joined users table -->
+                    <td>{{ respondent.username or 'N/A' }}</td>
+                    <td>
+                      {% if respondent.assessment_status == 'Assessed' %}
+                        <span class="badge badge-success">Assessed</span>
+                      {% else %}
+                      <a href="{{ url_for('assessment.assess', demo_data_id=respondent.id) }}"
+                           class="btn btn-primary btn-sm"
+                           data-toggle="tooltip" title="Assess Respondent">
+                          <i class="fas fa-edit"></i> Assessment
+                        </a>
+                      {% endif %}
+                    </td>
                     <td>
                       <div class="btn-group" role="group">
+                        
                         <a href="{{ url_for('demo_data.edit_demo_data', demo_data_id=respondent.id) }}"
                            class="btn btn-warning btn-sm"
                            data-toggle="tooltip" title="Edit Respondent">
@@ -131,7 +141,6 @@
 <script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
 <script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
 <script src="/static/assets/js/adminlte.js"></script>
-<script src="/static/assets/plugins/bootstrap/js/bootstrap-tooltip.min.js"></script>
 <script src="/static/assets/js/mine.js"></script>
 
 <script>

@@ -14,54 +14,58 @@ demo_data_bp = Blueprint('demo_data', __name__)
 
 
 
+
 @demo_data_bp.route('/manage_demo_data', methods=['GET'])
 def manage_demo_data():
     try:
-        # Using context manager to handle the DB connection and cursor
-        with get_db_connection() as conn:
-            with conn.cursor(dictionary=True) as cursor:
-                # SQL query to fetch all demo data along with the associated username
-                cursor.execute("""
-                    SELECT demo_data.*, users.username
-                    FROM demo_data
-                    LEFT JOIN users ON demo_data.user_id = users.id ORDER BY created_at 
-                """)
-                demo_data = cursor.fetchall()
-
-        # Ensure the session contains the required user info
+        # Get session information
         user_id = session.get('user_id')
         username = session.get('username', 'Guest')
         role = session.get('role', 'User')
+        full_name = None
 
+        # Fetch demo data with usernames and assessment status
+        with get_db_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                cursor.execute("""
+                    SELECT 
+                        demo_data.*, 
+                        users.username,
+                        CASE 
+                            WHEN scores.demo_data_id IS NOT NULL THEN 'Assessed'
+                            ELSE 'Unassessed'
+                        END AS assessment_status
+                    FROM demo_data
+                    LEFT JOIN users ON demo_data.user_id = users.id
+                    LEFT JOIN scores ON demo_data.id = scores.demo_data_id
+                    GROUP BY demo_data.id
+                    ORDER BY demo_data.created_at
+                """)
+                demo_data = cursor.fetchall()
+
+        # Optionally fetch full name of the logged-in user
         if user_id:
-            # Optionally, you could fetch additional user info, like their full name
             with get_db_connection() as conn:
                 with conn.cursor(dictionary=True) as cursor:
                     cursor.execute("SELECT first_name, last_name FROM users WHERE id = %s", (user_id,))
                     user_info = cursor.fetchone()
-
                     if user_info:
                         full_name = f"{user_info['first_name']} {user_info['last_name']}"
-                    else:
-                        full_name = "User"
 
-        # Rendering the template with the fetched data
+        # Render the page
         return render_template(
             'demo_data/manage_demo_data.html',
             username=username,
             role=role,
             demo_data=demo_data,
-            full_name=full_name if user_id else None
+            full_name=full_name
         )
+
     except Exception as e:
-        # Log the error for debugging purposes
-        logging.error(f"Error fetching demo data: {str(e)}")
-        
-        # Flashing an error message in case of an exception
-        flash(f"An error occurred while fetching demo data: {str(e)}", 'danger')
-        
-        # Redirecting to a safe page (main index or another fallback page)
+        logging.error(f"Error in manage_demo_data: {str(e)}")
+        flash(f"An error occurred while fetching respondent data: {str(e)}", 'danger')
         return redirect(url_for('main.index'))
+
 
 
 
