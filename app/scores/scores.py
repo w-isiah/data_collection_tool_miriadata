@@ -200,6 +200,7 @@ def view_scores(marks_scores_sku):
 
 @scores_bp.route("/edit_score/<string:marks_scores_sku>", methods=["GET", "POST"])
 def edit_score(marks_scores_sku):
+    
     """Handles editing a score and comment."""
     
     # Check if the user is logged in

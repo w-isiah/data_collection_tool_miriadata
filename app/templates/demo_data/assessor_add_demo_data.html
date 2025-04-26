@@ -1,0 +1,135 @@
+{% extends "layouts/assessor_base.html" %}
+
+{% block title %} Add Student Teacher {% endblock %}
+
+{% block body_class %} assessor_sidebar-mini {% endblock body_class %}
+
+{% block stylesheets %}
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<!-- AdminLTE Theme Style -->
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+{% endblock %}
+
+{% block content %}
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+
+  <!-- Flash Messages Section -->
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  <strong>{{ message }}</strong>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Header Section -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Add Demo Data</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item active">Add Demo Data</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Section -->
+  <section class="content">
+    <div class="container-fluid">
+      <!-- Add Demo Data Form -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Add Demo Data</h3>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="{{ url_for('demo_data.add_demo_data') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Sex -->
+                <div class="form-group">
+                  <label for="sex">Sex</label>
+                  <select class="form-control" id="sex" name="sex" required>
+                    <option value="" disabled selected>Select Sex</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+
+                <!-- Age Group -->
+                <div class="form-group">
+                  <label for="age_group">Age Group</label>
+                  <select class="form-control" id="age_group" name="age_group" required>
+                    <option value="" disabled selected>Select Age Group</option>
+                    <option value="Under 30">Under 30</option>
+                    <option value="30 to under 40">30 to under 40</option>
+                    <option value="40 and above">40 and above</option>
+                  </select>
+                </div>
+
+                <!-- Employment Status -->
+                <div class="form-group">
+                  <label for="employment_status">Employment Status</label>
+                  <select class="form-control" id="employment_status" name="employment_status" required>
+                    <option value="" disabled selected>Select Employment Status</option>
+                    <option value="Teacher">Teacher</option>
+                    <option value="Caregiver">Caregiver</option>
+                  </select>
+                </div>
+
+                <!-- Years at School -->
+                <div class="form-group">
+                  <label for="years_at_school">Years at School</label>
+                  <select class="form-control" id="years_at_school" name="years_at_school" required>
+                    <option value="" disabled selected>Select Years at School</option>
+                    <option value="1 year and below">1 year and below</option>
+                    <option value="2-4 years">2-4 years</option>
+                    <option value="5-9 years">5-9 years</option>
+                    <option value="10 years and above">10 years and above</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Demo Data</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<!-- jQuery -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/assets/js/adminlte.js"></script>
+{% endblock %}

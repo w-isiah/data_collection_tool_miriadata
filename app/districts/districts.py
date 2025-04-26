@@ -17,8 +17,13 @@ def manage_districts():
     cursor.execute("SELECT * FROM districts")
     districts = cursor.fetchall()  # Fetch all districts from the database
     conn.close()
-    
-    return render_template('districts/manage_districts.html', username=session['username'], role=session['role'],districts=districts)
+
+    role=session.get("role")
+    if role == "School Practice Supervisor":
+        return render_template('districts/assessor_manage_district.html', username=session['username'], role=session['role'],districts=districts)
+    else:
+        return render_template('districts/manage_districts.html', username=session['username'], role=session['role'],districts=districts)
+
 
 
 
@@ -67,10 +72,17 @@ def edit_district(district_id):
         return redirect(url_for('districts.manage_districts'))
 
     conn.close()
-    return render_template('districts/edit_district.html',
-                           username=session['username'],
-                           role=session['role'],
-                           district=district)
+    role=session.get("role")
+    if role == "School Practice Supervisor":
+        return render_template('districts/assessor_edit_district.html',
+                               username=session['username'],
+                               role=session['role'],
+                               district=district)
+    else:
+        return render_template('districts/edit_district.html',
+                               username=session['username'],
+                               role=session['role'],
+                               district=district)
 
 
 
@@ -125,6 +137,13 @@ def add_district():
             return redirect(url_for('districts.add_district'))
 
     # GET request — render the form
-    return render_template('districts/add_district.html',
-                           username=session['username'],
-                           role=session['role'])
+    role=session.get("role")
+    if role == "School Practice Supervisor":
+        return render_template('districts/assessor_add_district.html',
+                               username=session['username'],
+                               role=session['role'])
+    else:
+        return render_template('districts/add_district.html',
+                               username=session['username'],
+                               role=session['role'])
+

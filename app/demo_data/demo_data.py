@@ -11,6 +11,7 @@ demo_data_bp = Blueprint('demo_data', __name__)
 
 @demo_data_bp.route('/manage_demo_data', methods=['GET'])
 def manage_demo_data():
+    role0 = session.get('role')
     try:
         # Get session information
         user_id = session.get('user_id')
@@ -18,7 +19,7 @@ def manage_demo_data():
         role = session.get('role', 'User')
         full_name = None
 
-        # Fetch demo data with usernames and assessment status
+        # Fetch demo data only for the logged-in user
         with get_db_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
                 cursor.execute("""
@@ -33,9 +34,10 @@ def manage_demo_data():
                     FROM demo_data
                     LEFT JOIN users ON demo_data.user_id = users.id
                     LEFT JOIN scores ON demo_data.id = scores.demo_data_id
+                    WHERE demo_data.user_id = %s
                     GROUP BY demo_data.id
                     ORDER BY demo_data.created_at
-                """)
+                """, (user_id,))
                 demo_data = cursor.fetchall()
 
         # Optionally fetch full name of the logged-in user
@@ -48,13 +50,22 @@ def manage_demo_data():
                         full_name = f"{user_info['first_name']} {user_info['last_name']}"
 
         # Render the page
-        return render_template(
-            'demo_data/manage_demo_data.html',
-            username=username,
-            role=role,
-            demo_data=demo_data,
-            full_name=full_name
-        )
+        if role0 == "Head of Department":
+            return render_template(
+                'demo_data/manage_demo_data.html',
+                username=username,
+                role=role,
+                demo_data=demo_data,
+                full_name=full_name
+            )
+        elif role0 == "School Practice Supervisor":
+            return render_template(
+                'demo_data/assessor_manage_demo_data.html',
+                username=username,
+                role=role,
+                demo_data=demo_data,
+                full_name=full_name
+            )
 
     except Exception as e:
         logging.error(f"Error in manage_demo_data: {str(e)}")
@@ -69,8 +80,10 @@ def manage_demo_data():
 
 
 
+
 @demo_data_bp.route('/edit_demo_data/<int:demo_data_id>', methods=['GET', 'POST'])
 def edit_demo_data(demo_data_id):
+    role0 = session.get('role')
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -114,10 +127,18 @@ def edit_demo_data(demo_data_id):
         return redirect(url_for('demo_data.manage_demo_data'))
 
     conn.close()
-    return render_template('demo_data/edit_demo_data.html',
-                           username=session.get('username'),
-                           role=session.get('role'),
-                           demo_data=demo_data)
+    if role0 == "Head of Department":
+        return render_template('demo_data/edit_demo_data.html',
+                               username=session.get('username'),
+                               role=session.get('role'),
+                               demo_data=demo_data)
+    elif role0 == "School Practice Supervisor":
+        return render_template('demo_data/assessor_edit_demo_data.html',
+                               username=session.get('username'),
+                               role=session.get('role'),
+                               demo_data=demo_data)
+
+
 
 
 
@@ -136,6 +157,7 @@ def generate_id_number():
 
 @demo_data_bp.route('/add_demo_data', methods=['GET', 'POST'])
 def add_demo_data():
+    role0 = session.get('role')
     if request.method == 'POST':
         # Retrieve current user_id from the session (assumed to be stored in session)
         user_id = session.get('user_id')  # Ensure your session contains the 'user_id'
@@ -181,9 +203,14 @@ def add_demo_data():
             return redirect(url_for('demo_data.add_demo_data'))
 
     # GET request (render form)
-    return render_template('demo_data/add_demo_data.html',
-                           username=session.get('username'),
-                           role=session.get('role'))
+    if role0 == "Head of Department":
+        return render_template('demo_data/add_demo_data.html',
+                               username=session.get('username'),
+                               role=session.get('role'))
+    elif role0 == "School Practice Supervisor":\
+        return render_template('demo_data/assessor_add_demo_data.html',
+                               username=session.get('username'),
+                               role=session.get('role'))
 
 
 

@@ -1,0 +1,99 @@
+{% extends "layouts/assessor_base.html" %}
+
+{% block title %} Add Student Teacher {% endblock %}
+
+{% block body_class %} assessor_sidebar-mini {% endblock body_class %}
+
+{% block stylesheets %}
+<!-- Include necessary stylesheets for the page -->
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+
+  <!-- Content Header Section -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Add District</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('districts.manage_districts') }}">Districts</a></li>
+            <li class="breadcrumb-item active">Add District</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Section -->
+  <section class="content">
+    <div class="container-fluid">
+
+      <!-- Add District Form -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Add District</h3>
+            </div>
+            <div class="card-body">
+              <!-- Display flash messages -->
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  <div class="alert-container">
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              {% endwith %}
+
+              <!-- Form to Add District -->
+              <form method="POST" action="{{ url_for('districts.add_district') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="form-group">
+                  <label for="district_name">District Name</label>
+                  <input type="text" class="form-control" id="district_name" name="district_name" placeholder="Enter District Name" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="region">Region</label>
+                  <input type="text" class="form-control" id="region" name="region" placeholder="Enter Region (optional)">
+                </div>
+
+                <div class="form-group">
+                  <label for="country">Country</label>
+                  <input type="text" class="form-control" id="country" name="country" placeholder="Enter Country (optional)">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add District</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Include necessary JavaScript files for the page -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+{% endblock javascripts %}

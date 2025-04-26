@@ -1,0 +1,82 @@
+{% extends "layouts/assessor_base.html" %}
+
+{% block title %} Edit Student Teacher {% endblock %}
+
+{% block body_class %} assessor_sidebar-mini {% endblock body_class %}
+
+{% block stylesheets %}
+<!-- Include necessary stylesheets for the page -->
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+
+  <!-- Content Header Section -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Edit District</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('districts.manage_districts') }}">Districts</a></li>
+            <li class="breadcrumb-item active">Edit District</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Section -->
+  <section class="content">
+    <div class="container-fluid">
+
+      <!-- Edit District Form -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Edit District</h3>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="{{ url_for('districts.edit_district', district_id=district.id) }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="form-group">
+                  <label for="district_name">District Name</label>
+                  <input type="text" class="form-control" id="district_name" name="district_name" value="{{ district.district_name }}" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="region">Region</label>
+                  <input type="text" class="form-control" id="region" name="region" value="{{ district.region }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="country">Country</label>
+                  <input type="text" class="form-control" id="country" name="country" value="{{ district.country }}">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update District</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Include necessary JavaScript files for the page -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+{% endblock javascripts %}

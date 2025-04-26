@@ -41,13 +41,25 @@ def add_schools():
     cursor.close()
     conn.close()
 
-    return render_template(
-        'schools/add_schools.html',
-        username=session['username'],
-        role=session['role'],
-        categories=categories,
-        districts=districts
-    )
+    role=session.get("role")
+    if role == "School Practice Supervisor":
+
+        return render_template(
+            'schools/assessor_add_schools.html',
+            username=session['username'],
+            role=session['role'],
+            categories=categories,
+            districts=districts
+        )
+    else:
+        return render_template(
+            'schools/add_schools.html',
+            username=session['username'],
+            role=session['role'],
+            categories=categories,
+            districts=districts
+        )
+
 
 
 
@@ -92,8 +104,11 @@ def edit_schools(school_id):
 
         flash('School updated successfully!', 'success')
         return redirect(url_for('schools.manage_schools'))
-
-    return render_template('schools/edit_schools.html',username=session['username'],role=session['role'], school=school, categories=categories)
+    role=session.get("role")
+    if role == "School Practice Supervisor":
+        return render_template('schools/assessor_edit_schools.html',username=session['username'],role=session['role'], school=school, categories=categories)
+    else:
+        return render_template('schools/edit_schools.html',username=session['username'],role=session['role'], school=school, categories=categories)
 
 
 
@@ -126,12 +141,23 @@ def manage_schools():
     cursor.close()
     conn.close()
 
-    return render_template(
-        'schools/manage_schools.html',
-        username=session['username'],
-        role=session['role'],
-        schools=schools
-    )
+    role=session.get("role")
+    if role == "School Practice Supervisor":
+
+        return render_template(
+            'schools/assessor_manage_schools.html',
+            username=session['username'],
+            role=session['role'],
+            schools=schools
+        )
+    else:
+        return render_template(
+            'schools/manage_schools.html',
+            username=session['username'],
+            role=session['role'],
+            schools=schools
+        )
+
 
 
 
