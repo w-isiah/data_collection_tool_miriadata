@@ -97,7 +97,7 @@ def save_scores():
         conn.commit()
 
         flash("Scores and comments saved successfully!", "success")
-        return redirect(url_for("student.manage_assess_students"))
+        return redirect(url_for("demo_data.manage_demo_data"))
 
     except Exception as e:
         logging.error(f"An error occurred while saving scores: {str(e)}")
@@ -106,6 +106,11 @@ def save_scores():
 
     finally:
         conn.close()
+
+
+
+
+
 
 
 
@@ -124,9 +129,9 @@ def view_scores(marks_scores_sku):
     try:
         assessor_id = session["id"]
 
-        # Fetch the data using marks_scores_sku from both the `marks` and `scores` tables
+        # Fetch data using marks_scores_sku from both `marks` and `scores` tables
         cursor.execute("""
-            SELECT m.student_id, m.assessor_id, m.term_id, m.school_id, m.marks, m.assessment_type, m.date_awarded, m.marks_scores_sku, 
+            SELECT m.assessor_id, m.school_id, m.marks, m.assessment_type, m.date_awarded, m.marks_scores_sku, 
                    s.aspect_id, a.aspect_name, c.criteria_name, s.score
             FROM marks m
             JOIN scores s ON m.marks_scores_sku = s.marks_scores_sku
@@ -136,17 +141,14 @@ def view_scores(marks_scores_sku):
         """, (marks_scores_sku,))
         saved_data = cursor.fetchall()
 
-        cursor.execute('SELECT comment FROM general_comments WHERE marks_scores_sku= %s', (marks_scores_sku,))
+        # Get general comment if available
+        cursor.execute('SELECT comment FROM general_comments WHERE marks_scores_sku = %s', (marks_scores_sku,))
         comment = cursor.fetchone()
         print(f'comment is : {comment}')
 
-
-
-
-        cursor.execute("SELECT marks FROM  marks WHERE marks_scores_sku = %s", (marks_scores_sku,))
+        # Get mark score from marks table
+        cursor.execute("SELECT marks FROM marks WHERE marks_scores_sku = %s", (marks_scores_sku,))
         mark_score = cursor.fetchone()
-
-
 
         if not saved_data:
             flash("No data found for this marks_scores_sku.", "warning")
@@ -154,7 +156,7 @@ def view_scores(marks_scores_sku):
 
         flash("Scores fetched successfully!", "success")
 
-        # Determine the user's role and render the appropriate template
+        # Render based on user role
         if role0 == "Head of Department":
             return render_template("scores/evaluation_summary.html", 
                                    username=session['username'], 
@@ -182,21 +184,6 @@ def view_scores(marks_scores_sku):
 
     finally:
         conn.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

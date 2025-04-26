@@ -3,15 +3,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.db import get_db_connection
 import random
 import string
+import logging
 
 demo_data_bp = Blueprint('demo_data', __name__)
-
-
-
-
-
-
-
 
 
 
@@ -30,6 +24,7 @@ def manage_demo_data():
                 cursor.execute("""
                     SELECT 
                         demo_data.*, 
+                        scores.marks_scores_sku,
                         users.username,
                         CASE 
                             WHEN scores.demo_data_id IS NOT NULL THEN 'Assessed'
