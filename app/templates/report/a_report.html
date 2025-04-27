@@ -61,7 +61,7 @@
         <a href="{{ url_for('demo_data.add_demo_data') }}" class="btn btn-primary">
           <i class="fas fa-plus-circle"></i> Add a Teacher
         </a>
-        <a href="{{ url_for('report.export_report') }}" class="btn btn-success">
+        <a href="{{ url_for('report.a_export_report') }}" class="btn btn-success">
           <i class="fas fa-file-excel"></i> Export to Excel
         </a>
       </div>
@@ -78,18 +78,26 @@
               <thead>
                 <tr>
                   <th>ID Number</th>
+                  <th>Sex</th>
+                  <th>Age Group</th>
+                  <th>Employment Status</th>
+                  <th>Years at School</th>
                   <th>Aspect Name</th>
-                  <th>Score</th>
                   <th>Criteria Name</th>
+                  <th>Aspect Score</th>
                 </tr>
               </thead>
               <tbody>
-                {% for Teacher in demo_data %}
+                {% for teacher in demo_data %}
                   <tr>
-                    <td>{{ Teacher.id_number }}</td>
-                    <td>{{ Teacher.aspect_name }}</td>
-                    <td>{{ Teacher.score }}</td>
-                    <td>{{ Teacher.criteria_name }}</td>
+                    <td>{{ teacher.id_number }}</td>
+                    <td>{{ teacher.sex }}</td>
+                    <td>{{ teacher.age_group }}</td>
+                    <td>{{ teacher.employment_status }}</td>
+                    <td>{{ teacher.years_at_school }}</td>
+                    <td><sm>{{ teacher.aspect_name }}</sm></td> <!-- Aspect Name is now small -->
+                    <td>{{ teacher.criteria_name }}</td>
+                    <td>{{ teacher.score }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -129,4 +137,3 @@
     });
   </script>
 {% endblock %}
-sss
