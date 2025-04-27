@@ -143,7 +143,7 @@ def a_report():
             LEFT JOIN scores ON demo_data.id = scores.demo_data_id
             LEFT JOIN aspect ON scores.aspect_id = aspect.aspect_id
             LEFT JOIN assessment_criteria ON scores.criteria_id = assessment_criteria.criteria_id
-            ORDER BY demo_data.id_number, aspect.aspect_name
+            ORDER BY assessment_criteria.criteria_id
         """
 
         # Fetch data from the database
@@ -160,6 +160,7 @@ def a_report():
         logging.error(f"Error fetching report data: {str(e)}")
         flash(f"An error occurred while fetching the report data: {str(e)}", 'danger')
         return redirect(url_for('main.index'))
+
 
 
 

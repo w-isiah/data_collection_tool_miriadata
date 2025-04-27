@@ -14,10 +14,13 @@ demo_data_bp = Blueprint('demo_data', __name__)
 
 
 
-@demo_data_bp.route('/manage_demo_data', methods=['GET'])
+
+
+
+@demo_data_bp.route('/manage_demo_data', methods=['GET', 'POST'])
 def manage_demo_data():
     role0 = session.get('role')
-    
+
     if not role0:
         flash("Role is missing in session, please log in again.", "warning")
         return redirect(url_for('main.index'))
@@ -32,30 +35,79 @@ def manage_demo_data():
             flash("User ID is missing. Please log in.", "warning")
             return redirect(url_for('main.index'))
 
-        # Fetch demo data and district name for the logged-in user
+        # Fetch filter parameters from request.form
+        filters = {
+            'id_number': request.form.get('id_number'),
+            'sex': request.form.get('sex'),
+            'age_group': request.form.get('age_group'),
+            'employment_status': request.form.get('employment_status'),
+            'years_at_school': request.form.get('years_at_school'),
+            'district': request.form.get('district'),
+            'created_from': request.form.get('created_from'),
+            'created_to': request.form.get('created_to'),
+        }
+
+        # Build SQL query with filters
+        query = """
+            SELECT 
+                demo_data.*, 
+                users.username,
+                districts.district_name,
+                CASE 
+                    WHEN scores.demo_data_id IS NOT NULL THEN 'Assessed'
+                    ELSE 'Unassessed'
+                END AS assessment_status,
+                users.first_name,
+                users.last_name
+            FROM demo_data
+            LEFT JOIN users ON demo_data.user_id = users.id
+            LEFT JOIN scores ON demo_data.id = scores.demo_data_id
+            LEFT JOIN districts ON demo_data.district_id = districts.id
+            WHERE demo_data.user_id = %s 
+        """
+        
+        params = [user_id]
+        
+        # Add filters to the query dynamically
+        if filters['id_number']:
+            query += " AND demo_data.id_number LIKE %s"
+            params.append(f"%{filters['id_number']}%")
+        
+        if filters['sex']:
+            query += " AND demo_data.sex = %s"
+            params.append(filters['sex'])
+        
+        if filters['age_group']:
+            query += " AND demo_data.age_group = %s"
+            params.append(filters['age_group'])
+        
+        if filters['employment_status']:
+            query += " AND demo_data.employment_status = %s"
+            params.append(filters['employment_status'])
+        
+        if filters['years_at_school']:
+            query += " AND demo_data.years_at_school = %s"
+            params.append(filters['years_at_school'])
+        
+        if filters['district']:
+            query += " AND districts.district_name LIKE %s"
+            params.append(f"%{filters['district']}%")
+        
+        # Date filters
+        if filters['created_from']:
+            query += " AND demo_data.created_at >= %s"
+            params.append(filters['created_from'])
+        
+        if filters['created_to']:
+            query += " AND demo_data.created_at <= %s"
+            params.append(filters['created_to'])
+        
+        query += " GROUP BY demo_data.id_number ORDER BY demo_data.created_at DESC"
+        
+        # Fetch filtered data from the database
         with get_db_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
-                cursor.execute("""
-                    SELECT 
-                        demo_data.*, 
-                        scores.marks_scores_sku,
-                        users.username,
-                        districts.district_name,
-                        CASE 
-                            WHEN scores.demo_data_id IS NOT NULL THEN 'Assessed'
-                            ELSE 'Unassessed'
-                        END AS assessment_status,
-                        users.first_name,
-                        users.last_name
-                    FROM demo_data
-                    LEFT JOIN users ON demo_data.user_id = users.id
-                    LEFT JOIN scores ON demo_data.id = scores.demo_data_id
-                    LEFT JOIN districts 
-                        ON demo_data.district_id = districts.id
-                    WHERE demo_data.user_id = %s
-                    GROUP BY demo_data.id
-                    ORDER BY demo_data.created_at
-                """, (user_id,))
+                cursor.execute(query, tuple(params))
                 demo_data = cursor.fetchall()
 
         # Render the appropriate template based on role
@@ -79,7 +131,7 @@ def manage_demo_data():
 
     except Exception as e:
         logging.exception("Error in manage_demo_data")  # Log the full traceback
-        flash(f"An error occurred while fetching respondent data: {str(e)}", 'danger')
+        flash(f"An error occurred while fetching teacher data: {str(e)}", 'danger')
         return redirect(url_for('main.index'))
 
 
