@@ -47,68 +47,73 @@ def manage_demo_data():
             'created_to': request.form.get('created_to'),
         }
 
-        # Build SQL query with filters
-        query = """
-            SELECT 
-                demo_data.*, 
-                users.username,
-                districts.district_name,
-                CASE 
-                    WHEN scores.demo_data_id IS NOT NULL THEN 'Assessed'
-                    ELSE 'Unassessed'
-                END AS assessment_status,
-                users.first_name,
-                users.last_name
-            FROM demo_data
-            LEFT JOIN users ON demo_data.user_id = users.id
-            LEFT JOIN scores ON demo_data.id = scores.demo_data_id
-            LEFT JOIN districts ON demo_data.district_id = districts.id
-            WHERE demo_data.user_id = %s 
-        """
-        
-        params = [user_id]
-        
-        # Add filters to the query dynamically
-        if filters['id_number']:
-            query += " AND demo_data.id_number LIKE %s"
-            params.append(f"%{filters['id_number']}%")
-        
-        if filters['sex']:
-            query += " AND demo_data.sex = %s"
-            params.append(filters['sex'])
-        
-        if filters['age_group']:
-            query += " AND demo_data.age_group = %s"
-            params.append(filters['age_group'])
-        
-        if filters['employment_status']:
-            query += " AND demo_data.employment_status = %s"
-            params.append(filters['employment_status'])
-        
-        if filters['years_at_school']:
-            query += " AND demo_data.years_at_school = %s"
-            params.append(filters['years_at_school'])
-        
-        if filters['district']:
-            query += " AND districts.district_name LIKE %s"
-            params.append(f"%{filters['district']}%")
-        
-        # Date filters
-        if filters['created_from']:
-            query += " AND demo_data.created_at >= %s"
-            params.append(filters['created_from'])
-        
-        if filters['created_to']:
-            query += " AND demo_data.created_at <= %s"
-            params.append(filters['created_to'])
-        
-        query += " GROUP BY demo_data.id_number ORDER BY demo_data.created_at DESC"
-        
-        # Fetch filtered data from the database
-        with get_db_connection() as conn:
-            with conn.cursor(dictionary=True) as cursor:
-                cursor.execute(query, tuple(params))
-                demo_data = cursor.fetchall()
+        # If no filters are applied, return an empty list immediately for GET request
+        if request.method == 'GET' and not any(filters.values()):
+            demo_data = []  # No filters applied, return empty list
+        else:
+            # Build SQL query with filters
+            query = """
+                SELECT 
+                    demo_data.*, 
+                    users.username,
+                    districts.district_name,
+                    CASE 
+                        WHEN scores.demo_data_id IS NOT NULL THEN 'Assessed'
+                        ELSE 'Unassessed'
+                    END AS assessment_status,
+                    users.first_name,
+                    users.last_name
+                FROM demo_data
+                LEFT JOIN users ON demo_data.user_id = users.id
+                LEFT JOIN scores ON demo_data.id = scores.demo_data_id
+                LEFT JOIN districts ON demo_data.district_id = districts.id
+                WHERE demo_data.user_id = %s 
+            """
+            
+            params = [user_id]
+            conditions = []
+
+            # Add filters to the query dynamically
+            if filters['id_number']:
+                query += " AND demo_data.id_number LIKE %s"
+                params.append(f"%{filters['id_number']}%")
+            
+            if filters['sex']:
+                query += " AND demo_data.sex = %s"
+                params.append(filters['sex'])
+            
+            if filters['age_group']:
+                query += " AND demo_data.age_group = %s"
+                params.append(filters['age_group'])
+            
+            if filters['employment_status']:
+                query += " AND demo_data.employment_status = %s"
+                params.append(filters['employment_status'])
+            
+            if filters['years_at_school']:
+                query += " AND demo_data.years_at_school = %s"
+                params.append(filters['years_at_school'])
+            
+            if filters['district']:
+                query += " AND districts.district_name LIKE %s"
+                params.append(f"%{filters['district']}%")
+            
+            # Date filters
+            if filters['created_from']:
+                query += " AND demo_data.created_at >= %s"
+                params.append(filters['created_from'])
+            
+            if filters['created_to']:
+                query += " AND demo_data.created_at <= %s"
+                params.append(filters['created_to'])
+            
+            query += " GROUP BY demo_data.id_number ORDER BY demo_data.created_at DESC"
+            
+            # Fetch filtered data from the database
+            with get_db_connection() as conn:
+                with conn.cursor(dictionary=True) as cursor:
+                    cursor.execute(query, tuple(params))
+                    demo_data = cursor.fetchall()
 
         # Render the appropriate template based on role
         if role0 == "Principal_Investigator":
@@ -133,6 +138,7 @@ def manage_demo_data():
         logging.exception("Error in manage_demo_data")  # Log the full traceback
         flash(f"An error occurred while fetching teacher data: {str(e)}", 'danger')
         return redirect(url_for('main.index'))
+
 
 
 

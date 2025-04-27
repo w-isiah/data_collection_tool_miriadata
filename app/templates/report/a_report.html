@@ -42,7 +42,7 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0 text-dark">DEMOGRAPHIC INFORMATION</h1>
+          <h1 class="m-0 text-dark">Survey Data</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -67,6 +67,67 @@
       </div>
     </div>
 
+    <!-- Filters Form -->
+    <div class="row mb-3">
+      <div class="col-12">
+        <form method="GET" action="{{ url_for('report.a_report') }}">
+          <div class="form-row">
+            <div class="col-md-3">
+              <input type="text" class="form-control" name="id_number" placeholder="ID Number" value="{{ filters.id_number }}">
+            </div>
+            <div class="col-md-3">
+              <select class="form-control" name="sex">
+                <option value="">Select Sex</option>
+                <option value="Male" {% if filters.sex == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if filters.sex == 'Female' %}selected{% endif %}>Female</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select class="form-control" name="age_group">
+                <option value="">Select Age Group</option>
+                <option value="Under 30" {% if filters.age_group == 'Under 30' %}selected{% endif %}>Under 30</option>
+                <option value="30 to under 40" {% if filters.age_group == '30 to under 40' %}selected{% endif %}>30 to under 40</option>
+                <option value="40 and above" {% if filters.age_group == '40 and above' %}selected{% endif %}>40 and above</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select class="form-control" name="employment_status">
+                <option value="">Select Employment Status</option>
+                <option value="Teacher" {% if filters.employment_status == 'Teacher' %}selected{% endif %}>Teacher</option>
+                <option value="Caregiver" {% if filters.employment_status == 'Caregiver' %}selected{% endif %}>Caregiver</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row mt-2">
+            <div class="col-md-3">
+              <select class="form-control" name="years_at_school">
+                <option value="">Select Years at School</option>
+                <option value="1 year and below" {% if filters.years_at_school == '1 year and below' %}selected{% endif %}>1 year and below</option>
+                <option value="2-4 years" {% if filters.years_at_school == '2-4 years' %}selected{% endif %}>2-4 years</option>
+                <option value="5-9 years" {% if filters.years_at_school == '5-9 years' %}selected{% endif %}>5-9 years</option>
+                <option value="10 years and above" {% if filters.years_at_school == '10 years and above' %}selected{% endif %}>10 years and above</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input type="text" class="form-control" name="district" placeholder="District" value="{{ filters.district }}">
+            </div>
+            <div class="col-md-3">
+              <input type="date" class="form-control" name="created_from" value="{{ filters.created_from }}">
+            </div>
+            <div class="col-md-3">
+              <input type="date" class="form-control" name="created_to" value="{{ filters.created_to }}">
+            </div>
+          </div>
+          <div class="form-row mt-3">
+            <div class="col-12 text-right">
+              <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Teachers Table -->
     <div class="row">
       <div class="col-12">
         <div class="card">

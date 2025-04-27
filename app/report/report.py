@@ -18,47 +18,102 @@ report_bp = Blueprint('report', __name__)
 
 
 
-@report_bp.route('/report', methods=['GET'])
+@report_bp.route('/report', methods=['GET', 'POST'])
 def ra_report():
     try:
         # Get session information
         username = session.get('username', 'Guest')
         role = session.get('role', 'User')
-        role0 = role
 
-        # Fetch demo data for all users
-        with get_db_connection() as conn:
-            with conn.cursor(dictionary=True) as cursor:
-                cursor.execute("""
-                    SELECT 
-                        demo_data.*, 
-                        scores.marks_scores_sku,
-                        users.username,
-                        CASE 
-                            WHEN scores.demo_data_id IS NOT NULL THEN 'Assessed'
-                            ELSE 'Unassessed'
-                        END AS assessment_status
-                    FROM demo_data
-                    LEFT JOIN users ON demo_data.user_id = users.id
-                    LEFT JOIN scores ON demo_data.id = scores.demo_data_id
-                    GROUP BY demo_data.id
-                    ORDER BY demo_data.created_at
-                """)
-                demo_data = cursor.fetchall()
+        # Initialize filter parameters (defaults to None if not set)
+        filters = {
+            'id_number': request.form.get('id_number'),
+            'sex': request.form.get('sex'),
+            'age_group': request.form.get('age_group'),
+            'employment_status': request.form.get('employment_status'),
+            'years_at_school': request.form.get('years_at_school'),
+            'district': request.form.get('district'),
+            'created_from': request.form.get('created_from'),
+            'created_to': request.form.get('created_to')
+        }
 
-        # Render report page for authorized roles
-        if role0 in ["Principal_Investigator", " Research_Assistant"]:
+        # If it's a GET request and no filters are applied, return empty demo_data
+        if request.method == 'GET' and not any(filters.values()):
+            demo_data = []  # No filters applied, return empty list
+        else:
+            # Build SQL query with filters
+            query = """
+                SELECT 
+                    demo_data.*, 
+                    scores.marks_scores_sku,
+                    users.username,
+                    districts.district_name,
+                    CASE 
+                        WHEN scores.demo_data_id IS NOT NULL THEN 'Assessed'
+                        ELSE 'Unassessed'
+                    END AS assessment_status
+                FROM demo_data
+                LEFT JOIN users ON demo_data.user_id = users.id
+                LEFT JOIN scores ON demo_data.id = scores.demo_data_id
+                LEFT JOIN districts ON demo_data.district_id = districts.id
+                WHERE 1=1
+            """
+
+            # Initialize parameters for SQL query
+            params = []
+
+            # Add filters to the query dynamically based on the provided filter values
+            if filters['id_number']:
+                query += " AND demo_data.id_number LIKE %s"
+                params.append(f"%{filters['id_number']}%")
+            if filters['sex']:
+                query += " AND demo_data.sex = %s"
+                params.append(filters['sex'])
+            if filters['age_group']:
+                query += " AND demo_data.age_group = %s"
+                params.append(filters['age_group'])
+            if filters['employment_status']:
+                query += " AND demo_data.employment_status = %s"
+                params.append(filters['employment_status'])
+            if filters['years_at_school']:
+                query += " AND demo_data.years_at_school = %s"
+                params.append(filters['years_at_school'])
+            if filters['district']:
+                query += " AND districts.district_name LIKE %s"
+                params.append(f"%{filters['district']}%")
+            if filters['created_from']:
+                query += " AND demo_data.created_at >= %s"
+                params.append(filters['created_from'])
+            if filters['created_to']:
+                query += " AND demo_data.created_at <= %s"
+                params.append(filters['created_to'])
+
+            # Add GROUP BY and ORDER BY clauses
+            query += " GROUP BY demo_data.id_number ORDER BY demo_data.created_at"
+
+            # Fetch filtered demo data from the database
+            with get_db_connection() as conn:
+                with conn.cursor(dictionary=True) as cursor:
+                    cursor.execute(query, tuple(params))
+                    demo_data = cursor.fetchall()
+
+        # Render the report page with demo data for authorized roles
+        if role in ["Principal_Investigator", "Research_Assistant"]:
             return render_template(
                 'report/ra_report.html',
                 username=username,
                 role=role,
-                demo_data=demo_data
+                demo_data=demo_data,
+                filters=filters  # Pass filters to template for form repopulation
             )
 
     except Exception as e:
+        # Log the error and provide user feedback
         logging.error(f"Error in ra_report: {str(e)}")
         flash(f"An error occurred while fetching respondent data: {str(e)}", 'danger')
         return redirect(url_for('main.index'))
+
+
 
 
 
@@ -115,7 +170,7 @@ def export_report():
 
 
 
-@report_bp.route('/a_report', methods=['GET'])
+@report_bp.route('/a_report', methods=['GET', 'POST'])
 def a_report():
     try:
         # Retrieve session data for username and role
@@ -127,33 +182,80 @@ def a_report():
             flash("You are not authorized to view this report.", "warning")
             return redirect(url_for('main.index'))
 
-        # Query to fetch teacher data and associated aspect scores
-        query = """
-            SELECT 
-                demo_data.id_number,
-                demo_data.sex,
-                demo_data.age_group,
-                demo_data.employment_status,
-                demo_data.years_at_school,
-                demo_data.created_at AS teacher_created_at,
-                aspect.aspect_name,
-                scores.score,
-                assessment_criteria.criteria_name
-            FROM demo_data
-            LEFT JOIN scores ON demo_data.id = scores.demo_data_id
-            LEFT JOIN aspect ON scores.aspect_id = aspect.aspect_id
-            LEFT JOIN assessment_criteria ON scores.criteria_id = assessment_criteria.criteria_id
-            ORDER BY assessment_criteria.criteria_id
-        """
+        # Initialize filter parameters (defaults to None if not set)
+        filters = {
+            'id_number': request.args.get('id_number', ''),
+            'sex': request.args.get('sex', ''),
+            'age_group': request.args.get('age_group', ''),
+            'employment_status': request.args.get('employment_status', ''),
+            'years_at_school': request.args.get('years_at_school', ''),
+            'district': request.args.get('district', ''),
+            'created_from': request.args.get('created_from', ''),
+            'created_to': request.args.get('created_to', '')
+        }
 
-        # Fetch data from the database
-        with get_db_connection() as conn:
-            with conn.cursor(dictionary=True) as cursor:
-                cursor.execute(query)
-                demo_data = cursor.fetchall()
+        # If it's a GET request and no filters are applied, return empty demo_data
+        if request.method == 'GET' and not any(filters.values()):
+            demo_data = []  # No filters applied, return empty list
+        else:
+            # Build SQL query with filters
+            query = """
+                SELECT 
+                    demo_data.id_number,
+                    demo_data.sex,
+                    demo_data.age_group,
+                    demo_data.employment_status,
+                    demo_data.years_at_school,
+                    demo_data.created_at AS teacher_created_at,
+                    aspect.aspect_name,
+                    scores.score,
+                    assessment_criteria.criteria_name,
+                    districts.district_name
+                FROM demo_data
+                LEFT JOIN scores ON demo_data.id = scores.demo_data_id
+                LEFT JOIN aspect ON scores.aspect_id = aspect.aspect_id
+                LEFT JOIN assessment_criteria ON scores.criteria_id = assessment_criteria.criteria_id
+                LEFT JOIN districts ON demo_data.district_id = districts.id
+                WHERE 1=1
+            """
+
+            # Add conditions based on provided filters
+            params = []
+            if filters['id_number']:
+                query += " AND demo_data.id_number LIKE %s"
+                params.append(f"%{filters['id_number']}%")
+            if filters['sex']:
+                query += " AND demo_data.sex = %s"
+                params.append(filters['sex'])
+            if filters['age_group']:
+                query += " AND demo_data.age_group = %s"
+                params.append(filters['age_group'])
+            if filters['employment_status']:
+                query += " AND demo_data.employment_status = %s"
+                params.append(filters['employment_status'])
+            if filters['years_at_school']:
+                query += " AND demo_data.years_at_school = %s"
+                params.append(filters['years_at_school'])
+            if filters['district']:
+                query += " AND districts.district_name LIKE %s"
+                params.append(f"%{filters['district']}%")
+            if filters['created_from']:
+                query += " AND demo_data.created_at >= %s"
+                params.append(filters['created_from'])
+            if filters['created_to']:
+                query += " AND demo_data.created_at <= %s"
+                params.append(filters['created_to'])
+
+            query += " ORDER BY demo_data.created_at"
+
+            # Fetch filtered demo data from the database
+            with get_db_connection() as conn:
+                with conn.cursor(dictionary=True) as cursor:
+                    cursor.execute(query, tuple(params))
+                    demo_data = cursor.fetchall()
 
         # Render the report template with the fetched data
-        return render_template('report/a_report.html', username=username, role=role, demo_data=demo_data)
+        return render_template('report/a_report.html', username=username, role=role, demo_data=demo_data, filters=filters)
 
     except Exception as e:
         # Log the error and notify the user
