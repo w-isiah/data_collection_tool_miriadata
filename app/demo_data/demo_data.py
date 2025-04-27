@@ -174,15 +174,19 @@ def generate_id_number():
 
 
 
+import requests
+
+import requests
+import json
+
 @demo_data_bp.route('/add_demo_data', methods=['GET', 'POST'])
 def add_demo_data():
     role0 = session.get('role')
     user_id = session.get('user_id')
 
-    # Check if user_id exists in session
     if not user_id:
         flash("You must be logged in to add demo data.", 'danger')
-        return redirect(url_for('auth.login'))  # Or whatever the login route is
+        return redirect(url_for('auth.login'))
 
     # Fetch districts based on user role
     try:
@@ -194,41 +198,60 @@ def add_demo_data():
                 INNER JOIN districts d ON a.district_id = d.id 
                 WHERE a.research_assistant_id = %s
             """, (user_id,))
-            districts = cursor.fetchall()  # Fetch all districts for the user
+            districts = cursor.fetchall()
             if not districts:
                 flash("No districts found for your role.", 'warning')
-            print(districts)
     except Exception as e:
         app.logger.error(f"Error fetching districts: {str(e)}")
         flash("An error occurred while fetching districts.", 'danger')
         return redirect(url_for('demo_data.add_demo_data'))
 
     if request.method == 'POST':
-        # Retrieve form data
         sex = request.form.get('sex')
         age_group = request.form.get('age_group')
         employment_status = request.form.get('employment_status')
         years_at_school = request.form.get('years_at_school')
-        district_id = request.form.get('district_id')  # Retrieve selected district_id
+        district_id = request.form.get('district_id')
 
-        # Validate required fields
         if not all([sex, age_group, employment_status, years_at_school, district_id]):
             flash("All fields are required!", 'danger')
             return redirect(url_for('demo_data.add_demo_data'))
 
-        # Generate ID number for demo data
+        # Fetch location from ipinfo.io
+        try:
+            response = requests.get('https://ipinfo.io/json')
+            data = response.json()
+
+            location = data.get('loc')         # e.g., "40.7128,-74.0060"
+            city = data.get('city')
+            region = data.get('region')
+            country = data.get('country')
+
+            # Combine into a JSON-like string for storage
+            location_data = json.dumps({
+                "coordinates": location,
+                "city": city,
+                "region": region,
+                "country": country
+            })
+
+            print(f"Location data to store: {location_data}")  # Debug print
+
+        except Exception as e:
+            app.logger.error(f"Error getting location data: {e}")
+            location_data = None
+
         id_number = generate_id_number()
 
-        # Insert demo data into the database
+        # Insert data into database
         try:
             with get_db_connection() as conn:
                 cursor = conn.cursor(dictionary=True)
                 cursor.execute("""
                     INSERT INTO demo_data (
-                        id_number, sex, age_group, employment_status, years_at_school, user_id, district_id
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (id_number, sex, age_group, employment_status, years_at_school, user_id, district_id))
-
+                        id_number, sex, age_group, employment_status, years_at_school, user_id, district_id, location_data
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, (id_number, sex, age_group, employment_status, years_at_school, user_id, district_id, location_data))
                 conn.commit()
 
             flash(f"Entry added successfully! ID: {id_number}", 'success')
@@ -239,20 +262,13 @@ def add_demo_data():
             flash(f"An error occurred: {str(e)}", 'danger')
             return redirect(url_for('demo_data.add_demo_data'))
 
-    # Render templates based on role
-    if role0 == "Principal_Investigator":
-        return render_template('demo_data/add_demo_data.html',
-                               username=session.get('username'),
-                               role=session.get('role'),
-                               districts=districts)
-    elif role0 == "Research_Assistant":
-        return render_template('demo_data/assessor_add_demo_data.html',
-                               username=session.get('username'),
-                               role=session.get('role'),
-                               districts=districts)
-    else:
-        flash("Invalid role. You do not have permission to add demo data.", 'danger')
-        return redirect(url_for('home'))  # Redirect to a home or permission denied page
+    # Render form
+    template = 'demo_data/add_demo_data.html' if role0 == "Principal_Investigator" else 'demo_data/assessor_add_demo_data.html'
+    return render_template(template,
+                           username=session.get('username'),
+                           role=session.get('role'),
+                           districts=districts)
+
 
 
 
