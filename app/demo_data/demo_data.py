@@ -153,7 +153,7 @@ def edit_demo_data(demo_data_id):
 
 def generate_id_number():
     suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
-    return f"respondent{suffix}"
+    return f"teacher{suffix}"
 
 @demo_data_bp.route('/add_demo_data', methods=['GET', 'POST'])
 def add_demo_data():

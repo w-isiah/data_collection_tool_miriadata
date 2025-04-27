@@ -2,7 +2,6 @@ from flask import Flask
 from config import Config
 from flask_wtf.csrf import CSRFProtect
 from datetime import timedelta
-
 # Initialize Flask app
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -37,10 +36,12 @@ from app.ratings.ratings import ratings_bp
 from app.districts.districts import districts_bp
 from app.demo_data.demo_data import demo_data_bp
 from app.assign_ra.assign_ra import assign_ra_bp
+from app.report.report import report_bp
 
 
 
 # Register blueprints
+app.register_blueprint(report_bp, url_prefix='/report')
 app.register_blueprint(assign_ra_bp, url_prefix='/assign_ra')
 app.register_blueprint(demo_data_bp, url_prefix='/demo_data')
 app.register_blueprint(districts_bp, url_prefix='/districts')

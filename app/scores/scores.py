@@ -157,7 +157,7 @@ def view_scores(marks_scores_sku):
         flash("Scores fetched successfully!", "success")
 
         # Render based on user role
-        if role0 == "Head of Department":
+        if role0 == "Principal_Investigator":
             return render_template("scores/evaluation_summary.html", 
                                    username=session['username'], 
                                    role=session['role'],
@@ -165,7 +165,7 @@ def view_scores(marks_scores_sku):
                                    comment=comment, 
                                    saved_data=saved_data, 
                                    marks_scores_sku=marks_scores_sku)
-        elif role0 == "School Practice Supervisor":
+        elif role0 == "Research_Assistant":
             return render_template("scores/assessor/evaluation_summary.html", 
                                    username=session['username'], 
                                    role=session['role'],
@@ -251,7 +251,7 @@ def edit_score(marks_scores_sku):
             if records:
                 # Pass all records to the template
                 role=session.get("role")
-                if role == "School Practice Supervisor":
+                if role == "Research_Assistant":
                     return render_template(
                         "scores/assessor/edit_score.html",
                         username=session.get("username"),

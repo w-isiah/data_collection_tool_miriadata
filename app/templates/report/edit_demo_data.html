@@ -1,0 +1,100 @@
+{% extends "layouts/moderator_base.html" %}
+
+{% block title %}Edit Respondent{% endblock %}
+{% block body_class %}moderator_sidebar-mini{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+
+  <!-- Content Header -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Edit Respondent</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('demo_data.manage_demo_data') }}">Respondents</a></li>
+            <li class="breadcrumb-item active">Edit Respondent</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-info">
+            <div class="card-header">
+              <h3 class="card-title">Edit Respondent Information</h3>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="{{ url_for('demo_data.edit_demo_data', demo_data_id=demo_data.id) }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group">
+                  <label>ID Number (Generated)</label>
+                  <input type="text" class="form-control" value="{{ demo_data.id_number }}" disabled>
+                </div>
+
+                <div class="form-group">
+                  <label>Sex</label>
+                  <select class="form-control" name="sex" required>
+                    <option value="Male" {% if demo_data.sex == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if demo_data.sex == 'Female' %}selected{% endif %}>Female</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Age Group</label>
+                  <select class="form-control" name="age_group" required>
+                    <option value="Under 30" {% if demo_data.age_group == 'Under 30' %}selected{% endif %}>Under 30</option>
+                    <option value="30 to under 40" {% if demo_data.age_group == '30 to under 40' %}selected{% endif %}>30 to under 40</option>
+                    <option value="40 and above" {% if demo_data.age_group == '40 and above' %}selected{% endif %}>40 and above</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Employment Status</label>
+                  <select class="form-control" name="employment_status" required>
+                    <option value="Teacher" {% if demo_data.employment_status == 'Teacher' %}selected{% endif %}>Teacher</option>
+                    <option value="Caregiver" {% if demo_data.employment_status == 'Caregiver' %}selected{% endif %}>Caregiver</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Years at School</label>
+                  <select class="form-control" name="years_at_school" required>
+                    <option value="1 year and below" {% if demo_data.years_at_school == '1 year and below' %}selected{% endif %}>1 year and below</option>
+                    <option value="2–4 years" {% if demo_data.years_at_school == '2–4 years' %}selected{% endif %}>2–4 years</option>
+                    <option value="5–9 years" {% if demo_data.years_at_school == '5–9 years' %}selected{% endif %}>5–9 years</option>
+                    <option value="10 years and above" {% if demo_data.years_at_school == '10 years and above' %}selected{% endif %}>10 years and above</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Respondent</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/js/adminlte.min.js"></script>
+{% endblock javascripts %}
