@@ -113,6 +113,19 @@
                   </select>
                 </div>
 
+                 <!-- District Selection (Dropdown) -->
+                <div class="form-group">
+                  <label for="district">District</label>
+                  <select class="form-control" id="district" name="district_id" required>
+                    <option value="" disabled selected>Select District</option>
+                    {% for district in districts %}
+                    <option value="{{ district.id }}">{{ district.district_name }}</option>
+                    {% else %}
+                    <option value="" disabled>No districts found</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
                 <button type="submit" class="btn btn-primary">Add Demo Data</button>
               </form>
             </div>

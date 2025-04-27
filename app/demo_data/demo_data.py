@@ -9,16 +9,28 @@ demo_data_bp = Blueprint('demo_data', __name__)
 
 
 
+
+
+
+
+
 @demo_data_bp.route('/manage_demo_data', methods=['GET'])
 def manage_demo_data():
     role0 = session.get('role')
+    
+    if not role0:
+        flash("Role is missing in session, please log in again.", "warning")
+        return redirect(url_for('main.index'))
+
     try:
         # Get session information
         user_id = session.get('user_id')
         username = session.get('username', 'Guest')
         role = session.get('role', 'User')
-        
 
+        if not user_id:
+            flash("User ID is missing. Please log in.", "warning")
+            return redirect(url_for('main.index'))
 
         # Fetch demo data and district name for the logged-in user
         with get_db_connection() as conn:
@@ -38,16 +50,13 @@ def manage_demo_data():
                     FROM demo_data
                     LEFT JOIN users ON demo_data.user_id = users.id
                     LEFT JOIN scores ON demo_data.id = scores.demo_data_id
-                    LEFT JOIN assign_research_assistant 
-                        ON demo_data.user_id = assign_research_assistant.research_assistant_id
                     LEFT JOIN districts 
-                        ON assign_research_assistant.district_id = districts.id
+                        ON demo_data.district_id = districts.id
                     WHERE demo_data.user_id = %s
                     GROUP BY demo_data.id
                     ORDER BY demo_data.created_at
                 """, (user_id,))
                 demo_data = cursor.fetchall()
-
 
         # Render the appropriate template based on role
         if role0 == "Principal_Investigator":
@@ -56,7 +65,6 @@ def manage_demo_data():
                 username=username,
                 role=role,
                 demo_data=demo_data
-                
             )
         elif role0 == "Research_Assistant":
             return render_template(
@@ -64,16 +72,17 @@ def manage_demo_data():
                 username=username,
                 role=role,
                 demo_data=demo_data
-            
             )
         else:
             flash("Unauthorized role access.", "warning")
             return redirect(url_for('main.index'))
 
     except Exception as e:
-        logging.exception("Error in manage_demo_data")  # Full traceback for debugging
-        flash(f"An error occurred while fetching respondent data.", 'danger')
+        logging.exception("Error in manage_demo_data")  # Log the full traceback
+        flash(f"An error occurred while fetching respondent data: {str(e)}", 'danger')
         return redirect(url_for('main.index'))
+
+
 
 
 
