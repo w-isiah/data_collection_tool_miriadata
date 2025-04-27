@@ -17,13 +17,13 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0 text-dark">Edit Respondent</h1>
+          <h1 class="m-0 text-dark">Edit Teacher</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('demo_data.manage_demo_data') }}">Respondents</a></li>
-            <li class="breadcrumb-item active">Edit Respondent</li>
+            <li class="breadcrumb-item"><a href="{{ url_for('demo_data.manage_demo_data') }}">Teachers</a></li>
+            <li class="breadcrumb-item active">Edit Teacher</li>
           </ol>
         </div>
       </div>
@@ -37,7 +37,7 @@
         <div class="col-md-12">
           <div class="card card-info">
             <div class="card-header">
-              <h3 class="card-title">Edit Respondent Information</h3>
+              <h3 class="card-title">Edit Teacher Information</h3>
             </div>
             <div class="card-body">
               <form method="POST" action="{{ url_for('demo_data.edit_demo_data', demo_data_id=demo_data.id) }}">
@@ -83,7 +83,7 @@
                   </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Update Respondent</button>
+                <button type="submit" class="btn btn-primary">Update Teacher</button>
               </form>
             </div>
           </div>

@@ -1,6 +1,6 @@
 {% extends "layouts/moderator_base.html" %}
 
-{% block title %}Manage Respondents{% endblock %}
+{% block title %}Manage Teachers{% endblock %}
 {% block body_class %}moderator_sidebar-mini{% endblock %}
 
 {% block stylesheets %}
@@ -42,12 +42,12 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0 text-dark">Manage Respondents</h1>
+          <h1 class="m-0 text-dark">DEMOGRAPHIC INFORMATION</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
-            <li class="breadcrumb-item active">Respondents</li>
+            <li class="breadcrumb-item active">Teachers</li>
           </ol>
         </div>
       </div>
@@ -59,7 +59,7 @@
     <div class="row mb-3">
       <div class="col-12 d-flex justify-content-between flex-wrap gap-2">
         <a href="{{ url_for('demo_data.add_demo_data') }}" class="btn btn-primary">
-          <i class="fas fa-plus-circle"></i> Add Respondent
+          <i class="fas fa-plus-circle"></i> Add a Teacher
         </a>
         <a href="{{ url_for('report.export_report') }}" class="btn btn-success">
           <i class="fas fa-file-excel"></i> Export to Excel
@@ -71,7 +71,7 @@
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Respondents List</h3>
+            <h3 class="card-title">Teachers List</h3>
           </div>
           <div class="card-body">
             <table id="demoDataTable" class="table table-bordered table-striped table-hover">
@@ -88,41 +88,41 @@
                 </tr>
               </thead>
               <tbody>
-                {% for respondent in demo_data %}
+                {% for Teacher in demo_data %}
                   <tr>
-                    <td><sm>{{ respondent.id_number }}</sm></td>
-                    <td>{{ respondent.sex }}</td>
-                    <td>{{ respondent.age_group }}</td>
-                    <td>{{ respondent.employment_status }}</td>
-                    <td>{{ respondent.years_at_school }}</td>
-                    <td>{{ respondent.username or 'N/A' }}</td>
+                    <td><sm>{{ Teacher.id_number }}</sm></td>
+                    <td>{{ Teacher.sex }}</td>
+                    <td>{{ Teacher.age_group }}</td>
+                    <td>{{ Teacher.employment_status }}</td>
+                    <td>{{ Teacher.years_at_school }}</td>
+                    <td>{{ Teacher.username or 'N/A' }}</td>
                     <td>
-                      {% if respondent.assessment_status == 'Assessed' %}
+                      {% if Teacher.assessment_status == 'Assessed' %}
                         <span class="badge badge-success">Assessed</span>
-                        <a href="{{ url_for('scores.view_scores', marks_scores_sku=respondent.marks_scores_sku) }}"
+                        <a href="{{ url_for('scores.view_scores', marks_scores_sku=Teacher.marks_scores_sku) }}"
                            class="btn btn-primary btn-sm" data-toggle="tooltip" title="View Data">
                           <i class="fas fa-eye"></i> View Data
                         </a>
-                        <a href="{{ url_for('scores.edit_score', marks_scores_sku=respondent.marks_scores_sku) }}"
+                        <a href="{{ url_for('scores.edit_score', marks_scores_sku=Teacher.marks_scores_sku) }}"
                            class="btn btn-secondary btn-sm" data-toggle="tooltip" title="Edit Score">
                           <i class="fas fa-edit"></i> Edit Data
                         </a>
                       {% else %}
-                        <a href="{{ url_for('assessment.assess', demo_data_id=respondent.id) }}"
-                           class="btn btn-success btn-sm" data-toggle="tooltip" title="Assess Respondent">
+                        <a href="{{ url_for('assessment.assess', demo_data_id=Teacher.id) }}"
+                           class="btn btn-success btn-sm" data-toggle="tooltip" title="Assess Teacher">
                           <i class="fas fa-tasks"></i> Assess
                         </a>
                       {% endif %}
                     </td>
                     <td>
                       <div class="btn-group" role="group">
-                        <a href="{{ url_for('demo_data.edit_demo_data', demo_data_id=respondent.id) }}"
-                           class="btn btn-warning btn-sm" data-toggle="tooltip" title="Edit Respondent">
+                        <a href="{{ url_for('demo_data.edit_demo_data', demo_data_id=Teacher.id) }}"
+                           class="btn btn-warning btn-sm" data-toggle="tooltip" title="Edit Teacher">
                           <i class="fas fa-edit"></i> Edit
                         </a>
-                        <a href="{{ url_for('demo_data.delete_demo_data', demo_data_id=respondent.id) }}"
-                           class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete Respondent"
-                           onclick="return confirm('Are you sure you want to delete this respondent?');">
+                        <a href="{{ url_for('demo_data.delete_demo_data', demo_data_id=Teacher.id) }}"
+                           class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete Teacher"
+                           onclick="return confirm('Are you sure you want to delete this Teacher?');">
                           <i class="fas fa-trash"></i> Delete
                         </a>
                       </div>
